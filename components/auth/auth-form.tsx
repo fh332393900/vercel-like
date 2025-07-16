@@ -23,6 +23,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const searchParams = useSearchParams()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [isGithubLoading, setIsGithubLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -81,8 +82,32 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
   }
 
-  const handleGithubAuth = () => {
-    window.location.href = "/api/auth/github"
+  const handleGithubAuth = async () => {
+    setIsGithubLoading(true)
+    try {
+      // Redirect to GitHub OAuth
+      window.location.href = "/api/auth/github"
+    } catch (error) {
+      toast({
+        title: "GitHub authentication failed",
+        description: "Unable to connect to GitHub. Please try again.",
+        variant: "destructive",
+      })
+      setIsGithubLoading(false)
+    }
+  }
+
+  const getErrorMessage = (error: string) => {
+    switch (error) {
+      case "github_auth_failed":
+        return "GitHub authentication failed. Please try again."
+      case "github_email_required":
+        return "GitHub account must have a public email address."
+      case "access_denied":
+        return "GitHub access was denied. Please try again."
+      default:
+        return "An error occurred during authentication."
+    }
   }
 
   return (
@@ -98,13 +123,29 @@ export function AuthForm({ mode }: AuthFormProps) {
       <CardContent>
         {error && (
           <Alert variant="destructive" className="mb-4">
-            <AlertDescription>
-              {error === "github_auth_failed"
-                ? "GitHub authentication failed. Please try again."
-                : "An error occurred during authentication."}
-            </AlertDescription>
+            <AlertDescription>{getErrorMessage(error)}</AlertDescription>
           </Alert>
         )}
+
+        {/* GitHub OAuth Button */}
+        <Button
+          variant="outline"
+          className="w-full gap-2 bg-black text-white hover:bg-gray-800 border-black mb-4"
+          onClick={handleGithubAuth}
+          disabled={isLoading || isGithubLoading}
+        >
+          {isGithubLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Github className="h-4 w-4" />}
+          {mode === "login" ? "Sign in with GitHub" : "Sign up with GitHub"}
+        </Button>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t"></span>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white px-2 text-muted-foreground">Or continue with email</span>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" && (
@@ -117,7 +158,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                disabled={isLoading}
+                disabled={isLoading || isGithubLoading}
               />
             </div>
           )}
@@ -131,7 +172,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               value={formData.email}
               onChange={handleChange}
               required
-              disabled={isLoading}
+              disabled={isLoading || isGithubLoading}
             />
           </div>
           <div className="space-y-2">
@@ -152,7 +193,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                disabled={isLoading}
+                disabled={isLoading || isGithubLoading}
                 minLength={6}
               />
               <Button
@@ -161,14 +202,14 @@ export function AuthForm({ mode }: AuthFormProps) {
                 size="icon"
                 className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground"
                 onClick={() => setShowPassword(!showPassword)}
-                disabled={isLoading}
+                disabled={isLoading || isGithubLoading}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
               </Button>
             </div>
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full" disabled={isLoading || isGithubLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -181,25 +222,6 @@ export function AuthForm({ mode }: AuthFormProps) {
             )}
           </Button>
         </form>
-
-        <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t"></span>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
-          </div>
-        </div>
-
-        <Button
-          variant="outline"
-          className="w-full gap-2 bg-transparent"
-          onClick={handleGithubAuth}
-          disabled={isLoading}
-        >
-          <Github className="h-4 w-4" />
-          GitHub
-        </Button>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">

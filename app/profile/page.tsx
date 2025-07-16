@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import type React from "react"
 
 import { useState } from "react"
@@ -144,7 +146,7 @@ export default function ProfilePage() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="relative">
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-2 bg-transparent">
                         <Camera className="h-4 w-4" />
                         Change Avatar
                       </Button>
@@ -262,7 +264,7 @@ export default function ProfilePage() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 bg-transparent">
                   <Check className="h-4 w-4 text-green-600" />
                   Connected
                 </Button>
@@ -278,7 +280,7 @@ export default function ProfilePage() {
                     <p className="text-sm text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2 bg-transparent">
                   <Check className="h-4 w-4 text-green-600" />
                   Verified
                 </Button>
