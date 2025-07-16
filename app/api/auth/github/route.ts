@@ -1,12 +1,48 @@
-import { NextResponse } from "next/server"
-import { loginWithGithub, createUserSession } from "@/lib/auth"
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: Request) {
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET
+const GITHUB_REDIRECT_URI =
+  process.env.GITHUB_REDIRECT_URI || `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/github`
+
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
+  const error = searchParams.get("error")
+
+  // Handle OAuth errors
+  if (error) {
+    console.error("GitHub OAuth error:", error)
+    return NextResponse.redirect(new URL(`/login?error=${error}`, request.url))
+  }
 
   if (!code) {
-    return NextResponse.redirect(new URL("/login", request.url))
+    // Generate state parameter for security
+    const state = crypto.randomUUID()
+
+    // Store state in cookie for verification
+    const response = NextResponse.redirect(
+      `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(GITHUB_REDIRECT_URI)}&scope=user:email&state=${state}`,
+    )
+
+    response.cookies.set("github_oauth_state", state, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 600, // 10 minutes
+      path: "/",
+    })
+
+    return response
+  }
+
+  // Verify state parameter
+  const storedState = request.cookies.get("github_oauth_state")?.value
+  const receivedState = searchParams.get("state")
+
+  if (!storedState || storedState !== receivedState) {
+    console.error("GitHub OAuth state mismatch")
+    return NextResponse.redirect(new URL("/login?error=state_mismatch", request.url))
   }
 
   try {
@@ -14,64 +50,108 @@ export async function GET(request: Request) {
     const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "DeployHub-App",
       },
       body: JSON.stringify({
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        client_id: GITHUB_CLIENT_ID,
+        client_secret: GITHUB_CLIENT_SECRET,
         code,
+        redirect_uri: GITHUB_REDIRECT_URI,
       }),
     })
 
+    console.error(tokenResponse, "tokenResponse")
+
     const tokenData = await tokenResponse.json()
-    console.log("GitHub token response:", tokenData)
+
+    console.error(tokenData, "---------")
 
     if (tokenData.error) {
       console.error("GitHub token error:", tokenData.error_description)
-      return NextResponse.redirect(new URL("/login?error=github_token_error", request.url))
+      throw new Error(tokenData.error_description || tokenData.error)
     }
 
-    const accessToken = tokenData.access_token
+    if (!tokenData.access_token) {
+      throw new Error("No access token received from GitHub")
+    }
 
-    // Fetch user data from GitHub
-    const githubUserResponse = await fetch("https://api.github.com/user", {
+    // Get user info from GitHub
+    const userResponse = await fetch("https://api.github.com/user", {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
+        Authorization: `Bearer ${tokenData.access_token}`,
+        Accept: "application/vnd.github.v3+json",
+        "User-Agent": "DeployHub-App",
       },
     })
-    const githubUserData = await githubUserResponse.json()
-    console.log("GitHub user data:", githubUserData)
 
-    if (githubUserData.message === "Bad credentials" || !githubUserData.id) {
-      console.error("Failed to fetch GitHub user data:", githubUserData.message)
-      return NextResponse.redirect(new URL("/login?error=github_user_fetch_failed", request.url))
+    if (!userResponse.ok) {
+      throw new Error("Failed to fetch user data from GitHub")
     }
 
-    // Login or create user in your database
-    const user = await loginWithGithub({
-      id: githubUserData.id.toString(),
-      email: githubUserData.email || `${githubUserData.login}@github.com`, // Fallback email
-      name: githubUserData.name || githubUserData.login,
-      avatar_url: githubUserData.avatar_url,
-      login: githubUserData.login,
-    })
-    console.log("User login/creation successful:", user.id)
+    const githubUser = await userResponse.json()
 
-    // Create session for the user
-    await createUserSession({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatar_url: user.avatar_url,
-    })
-    console.log("User session created successfully.")
+    // Get user email if not public
+    let email = githubUser.email
+    if (!email) {
+      const emailResponse = await fetch("https://api.github.com/user/emails", {
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "DeployHub-App",
+        },
+      })
 
-    // Redirect to dashboard
-    return NextResponse.redirect(new URL("/dashboard", request.url))
-  } catch (error) {
-    console.error("GitHub login error:", error)
-    return NextResponse.redirect(new URL("/login?error=github_login_failed", request.url))
+      if (emailResponse.ok) {
+        const emails = await emailResponse.json()
+        const primaryEmail = emails.find((e: any) => e.primary && e.verified)
+        email = primaryEmail?.email
+      }
+    }
+
+    if (!email) {
+      console.error("No email found for GitHub user:", githubUser.login)
+      return NextResponse.redirect(new URL("/login?error=github_email_required", request.url))
+    }
+
+    // Store GitHub user data in session/cookie for callback processing
+    const response = NextResponse.redirect(new URL("/api/auth/github/callback", request.url))
+
+    // Clear state cookie
+    response.cookies.delete("github_oauth_state")
+
+    // Log the data being set in the cookie
+    console.log("Setting github_user cookie with data:", {
+      id: githubUser.id.toString(),
+      email,
+      name: githubUser.name || githubUser.login,
+      avatar_url: githubUser.avatar_url,
+      login: githubUser.login,
+    })
+
+    // Set user data cookie
+    response.cookies.set(
+      "github_user",
+      JSON.stringify({
+        id: githubUser.id.toString(),
+        email,
+        name: githubUser.name || githubUser.login,
+        avatar_url: githubUser.avatar_url,
+        login: githubUser.login,
+      }),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 300, // 5 minutes
+        path: "/",
+      },
+    )
+
+    return response
+  } catch (error: any) {
+    console.error("GitHub OAuth error:", error)
+    return NextResponse.redirect(new URL("/login?error=github_auth_failed", request.url))
   }
 }
