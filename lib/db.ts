@@ -17,7 +17,7 @@ export async function createUser(userData: {
   const [user] = await sql`
     INSERT INTO users (email, name, password_hash, github_id, avatar_url, email_verified)
     VALUES (${userData.email}, ${userData.name}, ${userData.passwordHash || null}, ${userData.githubId || null}, ${userData.avatarUrl || null}, ${!!userData.githubId})
-    RETURNING id, email, name, avatar_url, email_verified, created_at
+    RETURNING id, email, name, avatar_url, github_id, email_verified, created_at
   `
   return user
 }
@@ -60,7 +60,7 @@ export async function createSession(userId: string, token: string, expiresAt: Da
 
 export async function getSessionByToken(token: string) {
   const [session] = await sql`
-    SELECT s.id, s.user_id, s.token, s.expires_at, u.email, u.name, u.avatar_url
+    SELECT s.id, s.user_id, s.token, s.expires_at, u.email, u.name, u.avatar_url, u.github_id, u.email_verified
     FROM sessions s
     JOIN users u ON s.user_id = u.id
     WHERE s.token = ${token} AND s.expires_at > NOW()

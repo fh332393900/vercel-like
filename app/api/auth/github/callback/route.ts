@@ -6,10 +6,17 @@ export async function GET(request: NextRequest) {
     const githubUserCookie = request.cookies.get("github_user")?.value
 
     if (!githubUserCookie) {
+      console.error("No GitHub user data found in callback")
       throw new Error("No GitHub user data found")
     }
 
     const githubUser = JSON.parse(githubUserCookie)
+
+    // Validate required fields
+    if (!githubUser.id || !githubUser.email || !githubUser.name) {
+      console.error("Invalid GitHub user data:", githubUser)
+      throw new Error("Invalid GitHub user data")
+    }
 
     // Login or create user with GitHub data
     const user = await loginWithGithub(githubUser)

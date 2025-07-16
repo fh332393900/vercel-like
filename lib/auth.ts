@@ -142,38 +142,61 @@ export async function loginWithGithub(githubUser: {
   email: string
   name: string
   avatar_url: string
+  login?: string
 }): Promise<User> {
-  // Check if user exists by GitHub ID
-  let user = await getUserByGithubId(githubUser.id)
+  try {
+    // Check if user exists by GitHub ID
+    let user = await getUserByGithubId(githubUser.id)
 
-  if (!user) {
-    // Check if user exists by email
-    user = await getUserByEmail(githubUser.email)
+    if (!user) {
+      // Check if user exists by email
+      user = await getUserByEmail(githubUser.email)
 
-    if (user) {
-      // Update existing user with GitHub info
+      if (user) {
+        // Update existing user with GitHub info
+        await sql`
+          UPDATE users 
+          SET github_id = ${githubUser.id}, avatar_url = ${githubUser.avatar_url}, email_verified = true, updated_at = NOW()
+          WHERE id = ${user.id}
+        `
+
+        // Fetch updated user
+        user = await getUserByGithubId(githubUser.id)
+      } else {
+        // Create new user
+        user = await createUser({
+          email: githubUser.email,
+          name: githubUser.name,
+          githubId: githubUser.id,
+          avatarUrl: githubUser.avatar_url,
+        })
+      }
+    } else {
+      // Update existing GitHub user's info
       await sql`
         UPDATE users 
-        SET github_id = ${githubUser.id}, avatar_url = ${githubUser.avatar_url}, email_verified = true
-        WHERE id = ${user.id}
+        SET name = ${githubUser.name}, avatar_url = ${githubUser.avatar_url}, email = ${githubUser.email}, updated_at = NOW()
+        WHERE github_id = ${githubUser.id}
       `
-    } else {
-      // Create new user
-      user = await createUser({
-        email: githubUser.email,
-        name: githubUser.name,
-        githubId: githubUser.id,
-        avatarUrl: githubUser.avatar_url,
-      })
-    }
-  }
 
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    avatar_url: user.avatar_url,
-    github_id: user.github_id,
-    email_verified: user.email_verified,
+      // Fetch updated user
+      user = await getUserByGithubId(githubUser.id)
+    }
+
+    if (!user) {
+      throw new Error("Failed to create or update user")
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatar_url: user.avatar_url,
+      github_id: user.github_id,
+      email_verified: user.email_verified,
+    }
+  } catch (error) {
+    console.error("Error in loginWithGithub:", error)
+    throw new Error("Failed to authenticate with GitHub")
   }
 }
