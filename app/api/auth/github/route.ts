@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Exchange code for access token
-    const tokenResponse = await fetch("https://api.github.com/login/oauth/access_token", {
+    const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
       method: "POST",
       headers: {
         Accept: "application/json",
