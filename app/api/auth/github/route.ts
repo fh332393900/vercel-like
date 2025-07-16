@@ -4,7 +4,7 @@ const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET
 const GITHUB_REDIRECT_URI =
   process.env.GITHUB_REDIRECT_URI ||
-  `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/github/callback`
+  `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/github`
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
