@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Eye, EyeOff, Github, Loader2 } from "lucide-react"
 
@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface AuthFormProps {
   mode: "login" | "signup"
@@ -19,6 +20,7 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -27,6 +29,8 @@ export function AuthForm({ mode }: AuthFormProps) {
     password: "",
     name: "",
   })
+
+  const error = searchParams.get("error")
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -38,20 +42,25 @@ export function AuthForm({ mode }: AuthFormProps) {
     setIsLoading(true)
 
     try {
-      // In a real app, this would call an API endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
+      const body =
+        mode === "login"
+          ? { email: formData.email, password: formData.password }
+          : { email: formData.email, password: formData.password, name: formData.name }
 
-      // Simulate successful authentication
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: "user-1",
-          name: formData.name || "Jane Doe",
-          email: formData.email,
-          avatar: "/placeholder.svg?height=40&width=40",
-        }),
-      )
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Authentication failed")
+      }
 
       toast({
         title: mode === "login" ? "Login successful" : "Account created",
@@ -60,10 +69,11 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       // Redirect to dashboard
       router.push("/dashboard")
-    } catch (error) {
+      router.refresh()
+    } catch (error: any) {
       toast({
         title: "Authentication failed",
-        description: "Please check your credentials and try again.",
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       })
     } finally {
@@ -71,41 +81,8 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
   }
 
-  const handleGithubAuth = async () => {
-    setIsLoading(true)
-
-    try {
-      // In a real app, this would redirect to GitHub OAuth
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Simulate successful authentication
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: "github-user-1",
-          name: "GitHub User",
-          email: "github@example.com",
-          avatar: "/placeholder.svg?height=40&width=40",
-        }),
-      )
-
-      toast({
-        title: "GitHub authentication successful",
-        description: "You have been authenticated via GitHub.",
-      })
-
-      // Redirect to dashboard
-      router.push("/dashboard")
-    } catch (error) {
-      toast({
-        title: "GitHub authentication failed",
-        description: "Please try again later.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
+  const handleGithubAuth = () => {
+    window.location.href = "/api/auth/github"
   }
 
   return (
@@ -119,6 +96,16 @@ export function AuthForm({ mode }: AuthFormProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>
+              {error === "github_auth_failed"
+                ? "GitHub authentication failed. Please try again."
+                : "An error occurred during authentication."}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" && (
             <div className="space-y-2">
@@ -166,6 +153,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 onChange={handleChange}
                 required
                 disabled={isLoading}
+                minLength={6}
               />
               <Button
                 type="button"
@@ -203,8 +191,13 @@ export function AuthForm({ mode }: AuthFormProps) {
           </div>
         </div>
 
-        <Button variant="outline" className="w-full gap-2" onClick={handleGithubAuth} disabled={isLoading}>
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Github className="h-4 w-4" />}
+        <Button
+          variant="outline"
+          className="w-full gap-2 bg-transparent"
+          onClick={handleGithubAuth}
+          disabled={isLoading}
+        >
+          <Github className="h-4 w-4" />
           GitHub
         </Button>
       </CardContent>

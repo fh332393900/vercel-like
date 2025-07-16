@@ -9,7 +9,8 @@ interface User {
   id: string
   name: string
   email: string
-  avatar: string
+  avatar_url?: string
+  email_verified: boolean
 }
 
 interface AuthContextType {
@@ -17,7 +18,8 @@ interface AuthContextType {
   isAuthenticated: boolean
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -28,16 +30,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  useEffect(() => {
-    // Check if user is authenticated on initial load
-    const checkAuth = () => {
-      const isAuth = localStorage.getItem("isAuthenticated") === "true"
-      const userData = localStorage.getItem("user")
-
-      if (isAuth && userData) {
-        setUser(JSON.parse(userData))
+  const refreshUser = async () => {
+    try {
+      const response = await fetch("/api/user/me")
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+      } else {
+        setUser(null)
       }
+    } catch (error) {
+      console.error("Error fetching user:", error)
+      setUser(null)
+    }
+  }
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      await refreshUser()
       setIsLoading(false)
     }
 
@@ -47,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Redirect to login if not authenticated and trying to access protected routes
   useEffect(() => {
     if (!isLoading && !user) {
-      const protectedRoutes = ["/dashboard", "/profile", "/settings", "/analytics"]
+      const protectedRoutes = ["/dashboard", "/profile", "/analytics"]
       const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
 
       if (isProtectedRoute) {
@@ -57,40 +67,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [isLoading, user, pathname, router])
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true)
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    })
 
+    if (!response.ok) {
+      const data = await response.json()
+      throw new Error(data.error || "Login failed")
+    }
+
+    const data = await response.json()
+    setUser(data.user)
+    router.push("/dashboard")
+  }
+
+  const logout = async () => {
     try {
-      // In a real app, this would call an API endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const mockUser = {
-        id: "user-1",
-        name: "Jane Doe",
-        email,
-        avatar: "/placeholder.svg?height=40&width=40",
-      }
-
-      localStorage.setItem("isAuthenticated", "true")
-      localStorage.setItem("user", JSON.stringify(mockUser))
-
-      setUser(mockUser)
-      router.push("/dashboard")
+      await fetch("/api/auth/logout", { method: "POST" })
     } catch (error) {
-      throw new Error("Login failed")
+      console.error("Logout error:", error)
     } finally {
-      setIsLoading(false)
+      setUser(null)
+      router.push("/login")
     }
   }
 
-  const logout = () => {
-    localStorage.removeItem("isAuthenticated")
-    localStorage.removeItem("user")
-    setUser(null)
-    router.push("/login")
-  }
-
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )
