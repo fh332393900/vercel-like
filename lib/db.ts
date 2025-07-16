@@ -50,22 +50,48 @@ export async function getUserByGithubId(githubId: string) {
 }
 
 export async function createSession(userId: string, token: string, expiresAt: Date) {
-  const [session] = await sql`
-    INSERT INTO sessions (user_id, token, expires_at)
-    VALUES (${userId}, ${token}, ${expiresAt.toISOString()})
-    RETURNING id, token, expires_at
-  `
-  return session
+  try {
+    console.log("Creating session in database:", { userId, expiresAt: expiresAt.toISOString() })
+
+    const [session] = await sql`
+      INSERT INTO sessions (user_id, token, expires_at)
+      VALUES (${userId}, ${token}, ${expiresAt.toISOString()})
+      RETURNING id, token, expires_at
+    `
+
+    console.log("Session created successfully:", { id: session.id })
+    return session
+  } catch (error) {
+    console.error("Error creating session in database:", error)
+    throw error
+  }
 }
 
 export async function getSessionByToken(token: string) {
-  const [session] = await sql`
-    SELECT s.id, s.user_id, s.token, s.expires_at, u.email, u.name, u.avatar_url, u.github_id, u.email_verified
-    FROM sessions s
-    JOIN users u ON s.user_id = u.id
-    WHERE s.token = ${token} AND s.expires_at > NOW()
-  `
-  return session
+  try {
+    console.log("Querying session by token:", token.substring(0, 10) + "...")
+
+    const [session] = await sql`
+      SELECT s.id, s.user_id, s.token, s.expires_at, u.email, u.name, u.avatar_url, u.github_id, u.email_verified
+      FROM sessions s
+      JOIN users u ON s.user_id = u.id
+      WHERE s.token = ${token} AND s.expires_at > NOW()
+    `
+
+    console.log("Session query result:", session ? "found" : "not found")
+    if (session) {
+      console.log("Session details:", {
+        user_id: session.user_id,
+        expires_at: session.expires_at,
+        email: session.email,
+      })
+    }
+
+    return session
+  } catch (error) {
+    console.error("Error querying session:", error)
+    throw error
+  }
 }
 
 export async function deleteSession(token: string) {

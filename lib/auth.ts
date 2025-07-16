@@ -39,19 +39,28 @@ export async function createUserSession(user: User): Promise<string> {
   const token = generateToken()
   const expiresAt = new Date(Date.now() + SESSION_DURATION)
 
-  await createSession(user.id, token, expiresAt)
+  console.log("Creating session for user:", user.id, "token:", token.substring(0, 10) + "...")
 
-  // Set HTTP-only cookie
-  const cookieStore = await cookies()
-  cookieStore.set("session", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    expires: expiresAt,
-    path: "/",
-  })
+  try {
+    await createSession(user.id, token, expiresAt)
+    console.log("Session created in database")
 
-  return token
+    // Set HTTP-only cookie
+    const cookieStore = await cookies()
+    cookieStore.set("session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      expires: expiresAt,
+      path: "/",
+    })
+
+    console.log("Session cookie set")
+    return token
+  } catch (error) {
+    console.error("Error creating session:", error)
+    throw error
+  }
 }
 
 export async function getCurrentUser(): Promise<User | null> {
@@ -59,17 +68,22 @@ export async function getCurrentUser(): Promise<User | null> {
     const cookieStore = await cookies()
     const sessionToken = cookieStore.get("session")?.value
 
+    console.log("Getting current user, session token:", sessionToken ? "exists" : "missing")
+
     if (!sessionToken) {
+      console.log("No session token found")
       return null
     }
 
     const session = await getSessionByToken(sessionToken)
+    console.log("Session query result:", session ? "found" : "not found")
 
     if (!session) {
+      console.log("Session not found or expired")
       return null
     }
 
-    return {
+    const user = {
       id: session.user_id,
       email: session.email,
       name: session.name,
@@ -77,6 +91,9 @@ export async function getCurrentUser(): Promise<User | null> {
       github_id: session.github_id,
       email_verified: session.email_verified,
     }
+
+    console.log("Returning user:", { id: user.id, email: user.email })
+    return user
   } catch (error) {
     console.error("Error getting current user:", error)
     return null

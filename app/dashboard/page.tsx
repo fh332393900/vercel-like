@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { NewProjectDialog } from "@/components/new-project-dialog"
+import { SessionDebug } from "@/components/debug/session-debug"
 
 // Mock data for projects
 const mockProjects = [
@@ -290,6 +291,11 @@ export default function DashboardPage() {
             </TabsContent>
           </Tabs>
         </div>
+        {process.env.NODE_ENV === "development" && (
+          <div className="container mt-8">
+            <SessionDebug />
+          </div>
+        )}
       </main>
 
       {/* New Project Dialog */}
