@@ -1,0 +1,290 @@
+{
+  "common": {
+    "appName": "DeployHub",
+    "login": "登录",
+    "signup": "注册",
+    "logout": "退出登录",
+    "back": "返回",
+    "cancel": "取消",
+    "continue": "继续",
+    "save": "保存更改",
+    "deploy": "部署",
+    "view": "查看",
+    "read": "阅读",
+    "features": "功能",
+    "pricing": "价格",
+    "documentation": "文档",
+    "getStarted": "开始使用",
+    "startFree": "免费开始",
+    "startTrial": "开始14天试用",
+    "contactSales": "联系销售"
+  },
+  "home": {
+    "hero": {
+      "badge": "无缝部署平台",
+      "title": "自信部署您的代码",
+      "description": "通过我们的无缝GitHub集成和即时部署，更快地发布您的项目。",
+      "getStarted": "开始使用",
+      "readDocs": "阅读文档"
+    },
+    "trustedBy": {
+      "title": "全球创新团队的信赖之选",
+      "description": "加入使用DeployHub部署数百万个项目的数千家公司",
+      "stats": {
+        "projects": "已部署项目",
+        "developers": "满意的开发者",
+        "uptime": "正常运行时间",
+        "responseTime": "平均响应时间"
+      }
+    },
+    "features": {
+      "badge": "强大功能",
+      "title": "强大功能",
+      "description": "轻松部署和管理项目所需的一切",
+      "github": {
+        "title": "GitHub集成",
+        "description": "连接您的GitHub仓库并一键部署"
+      },
+      "instant": {
+        "title": "即时部署",
+        "description": "推送到您的仓库，几秒钟内即可看到您的更改上线"
+      },
+      "framework": {
+        "title": "框架无关",
+        "description": "支持所有主要框架和静态站点生成器"
+      }
+    },
+    "edge": {
+      "badge": "全球边缘网络",
+      "title": "部署到边缘",
+      "description": "您的应用程序部署在我们的全球边缘网络上，确保世界各地的用户都能快速加载。",
+      "features": {
+        "cdn": "全球CDN，99.99%正常运行时间",
+        "ssl": "自动SSL证书",
+        "ddos": "包含DDoS保护"
+      }
+    },
+    "pricing": {
+      "badge": "简单定价",
+      "title": "选择适合您需求的完美方案",
+      "description": "没有隐藏费用。没有惊喜。随着您的成长而扩展。",
+      "plans": {
+        "hobby": {
+          "name": "爱好者",
+          "description": "适合个人项目和实验",
+          "features": ["最多3个项目", "1个团队成员", "基本分析", "手动部署", "社区支持"]
+        },
+        "pro": {
+          "name": "专业版",
+          "description": "适合专业人士和小型团队",
+          "features": ["无限项目", "最多5个团队成员", "高级分析", "自动部署", "自定义域名", "优先支持"]
+        },
+        "enterprise": {
+          "name": "企业版",
+          "description": "适合大型团队和组织",
+          "features": [
+            "无限项目",
+            "无限团队成员",
+            "企业级分析",
+            "自动部署",
+            "自定义域名",
+            "SSO认证",
+            "专属支持",
+            "SLA保证"
+          ]
+        }
+      },
+      "popular": "最受欢迎",
+      "month": "/月"
+    },
+    "docs": {
+      "badge": "文档",
+      "title": "全面的文档",
+      "description": "开始使用并充分利用DeployHub所需的一切",
+      "gettingStarted": {
+        "title": "入门指南",
+        "description": "了解如何在几分钟内设置您的第一个项目",
+        "items": ["创建账户", "连接您的GitHub仓库", "部署您的第一个项目"],
+        "cta": "阅读指南"
+      },
+      "api": {
+        "title": "API参考",
+        "description": "使用我们的API将DeployHub集成到您的工作流程中",
+        "items": ["认证", "项目API", "部署API"],
+        "cta": "查看API文档"
+      }
+    },
+    "testimonials": {
+      "badge": "客户故事",
+      "title": "全球开发者的喜爱",
+      "description": "看看我们的客户对DeployHub体验的评价"
+    },
+    "cta": {
+      "title": "准备好改变您的部署工作流程了吗？",
+      "description": "加入数千名已经简化部署流程的开发者。今天免费开始使用DeployHub。",
+      "steps": {
+        "signup": {
+          "title": "注册",
+          "description": "使用GitHub认证几秒钟内创建您的账户"
+        },
+        "connect": {
+          "title": "连接仓库",
+          "description": "一键链接您的GitHub仓库"
+        },
+        "deploy": {
+          "title": "部署",
+          "description": "推送您的代码，几秒钟内即可上线"
+        }
+      }
+    },
+    "footer": {
+      "rights": "保留所有权利。",
+      "terms": "条款",
+      "privacy": "隐私"
+    }
+  },
+  "dashboard": {
+    "projects": "项目",
+    "newProject": "新项目",
+    "allProjects": "所有项目",
+    "recentlyUpdated": "最近更新",
+    "favorites": "收藏",
+    "noProjects": "您还没有任何项目。",
+    "liveAt": "在线地址：",
+    "building": "构建中...",
+    "updated": "更新于",
+    "settings": "账户设置",
+    "notifications": {
+      "title": "通知",
+      "markAllRead": "标记所有为已读",
+      "viewAll": "查看所有通知",
+      "noNotifications": "没有通知",
+      "unread": "未读"
+    }
+  },
+  "newProject": {
+    "title": "创建新项目",
+    "description": "选择要部署的GitHub仓库。我们将自动检测框架和构建设置。",
+    "searchPlaceholder": "搜索仓库...",
+    "noRepos": {
+      "title": "未找到仓库",
+      "description": "我们找不到与您搜索匹配的任何仓库。"
+    },
+    "configure": {
+      "title": "配置项目",
+      "description": "在部署前配置您的项目设置。",
+      "framework": {
+        "label": "框架",
+        "description": "我们已为您的项目检测到以下框架。"
+      },
+      "rootDir": {
+        "label": "根目录",
+        "description": "您项目所在的目录。"
+      }
+    },
+    "deploying": {
+      "title": "部署项目",
+      "description": "我们正在设置您的项目。这可能需要几分钟。",
+      "steps": {
+        "cloning": "克隆仓库",
+        "installing": "安装依赖",
+        "building": "构建项目",
+        "deploying": "部署到生产环境"
+      },
+      "success": {
+        "title": "部署成功！",
+        "description": "您的项目已部署并上线。",
+        "viewProject": "查看项目"
+      }
+    }
+  },
+  "settings": {
+    "title": "账户设置",
+    "description": "管理您的账户设置和偏好",
+    "tabs": {
+      "profile": "个人资料",
+      "connections": "连接",
+      "notifications": "通知"
+    },
+    "profile": {
+      "title": "个人资料信息",
+      "description": "更新您的个人资料信息和头像",
+      "fullName": "全名",
+      "email": "电子邮箱",
+      "changeAvatar": "更改头像"
+    },
+    "connections": {
+      "title": "已连接账户",
+      "description": "管理您的已连接账户和服务",
+      "github": {
+        "title": "GitHub",
+        "connected": "已连接到github.com/",
+        "notConnected": "未连接",
+        "connect": "连接",
+        "disconnect": "断开连接"
+      }
+    },
+    "notifications": {
+      "title": "通知偏好",
+      "description": "管理您接收通知的方式和时间",
+      "email": {
+        "title": "电子邮件通知",
+        "description": "通过电子邮件接收通知"
+      },
+      "deployment": {
+        "title": "部署通知",
+        "description": "在部署成功或失败时获得通知"
+      },
+      "marketing": {
+        "title": "营销邮件",
+        "description": "接收有关新功能和优惠的更新"
+      }
+    }
+  },
+  "projectDetails": {
+    "backToProjects": "返回项目",
+    "redeploy": "重新部署",
+    "projectSettings": "项目设置",
+    "deleteProject": "删除项目",
+    "domains": {
+      "title": "域名",
+      "description": "配置您项目的域名",
+      "productionDomain": "生产域名",
+      "visit": "访问",
+      "addCustomDomain": "添加自定义域名",
+      "enterCustomDomain": "输入自定义域名"
+    },
+    "deployments": {
+      "title": "最近部署",
+      "description": "查看您最近的部署历史",
+      "production": "生产环境",
+      "preview": "预览",
+      "viewLogs": "查看日志"
+    },
+    "logs": {
+      "title": "部署日志",
+      "description": "查看您最新部署的日志",
+      "buildLogs": "构建日志",
+      "runtimeLogs": "运行时日志"
+    }
+  },
+  "auth": {
+    "welcomeBack": "欢迎回来",
+    "signInDescription": "登录您的账户以访问您的项目",
+    "signInWithGithub": "使用GitHub登录",
+    "signingIn": "登录中...",
+    "orContinueWith": "或继续使用",
+    "google": "Google",
+    "email": "电子邮箱",
+    "noAccount": "没有账户？",
+    "signUp": "注册",
+    "termsNotice": "登录即表示您同意我们的",
+    "termsOfService": "服务条款",
+    "and": "和",
+    "privacyPolicy": "隐私政策"
+  },
+  "language": {
+    "en": "English",
+    "zh-CN": "简体中文"
+  }
+}

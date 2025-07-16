@@ -1,0 +1,303 @@
+{
+  "common": {
+    "appName": "DeployHub",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "back": "Back",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "save": "Save Changes",
+    "deploy": "Deploy",
+    "view": "View",
+    "read": "Read",
+    "features": "Features",
+    "pricing": "Pricing",
+    "documentation": "Documentation",
+    "getStarted": "Get Started",
+    "startFree": "Start for Free",
+    "startTrial": "Start 14-Day Trial",
+    "contactSales": "Contact Sales"
+  },
+  "home": {
+    "hero": {
+      "badge": "Seamless Deployment Platform",
+      "title": "Deploy your code with confidence",
+      "description": "Ship your projects faster with our seamless GitHub integration and instant deployments.",
+      "getStarted": "Get Started",
+      "readDocs": "Read Documentation"
+    },
+    "trustedBy": {
+      "title": "Trusted by innovative teams worldwide",
+      "description": "Join thousands of companies deploying millions of projects with DeployHub",
+      "stats": {
+        "projects": "Projects Deployed",
+        "developers": "Happy Developers",
+        "uptime": "Uptime",
+        "responseTime": "Avg. Response Time"
+      }
+    },
+    "features": {
+      "badge": "Powerful Features",
+      "title": "Powerful Features",
+      "description": "Everything you need to deploy and manage your projects with ease",
+      "github": {
+        "title": "GitHub Integration",
+        "description": "Connect your GitHub repositories and deploy with a single click"
+      },
+      "instant": {
+        "title": "Instant Deployments",
+        "description": "Push to your repository and see your changes live in seconds"
+      },
+      "framework": {
+        "title": "Framework Agnostic",
+        "description": "Support for all major frameworks and static site generators"
+      }
+    },
+    "edge": {
+      "badge": "Global Edge Network",
+      "title": "Deploy to the Edge",
+      "description": "Your applications are deployed to our global edge network, ensuring fast load times for users anywhere in the world.",
+      "features": {
+        "cdn": "Global CDN with 99.99% uptime",
+        "ssl": "Automatic SSL certificates",
+        "ddos": "DDoS protection included"
+      }
+    },
+    "pricing": {
+      "badge": "Simple Pricing",
+      "title": "Choose the perfect plan for your needs",
+      "description": "No hidden fees. No surprises. Scale as you grow.",
+      "plans": {
+        "hobby": {
+          "name": "Hobby",
+          "description": "Perfect for personal projects and experiments",
+          "features": [
+            "Up to 3 projects",
+            "1 team member",
+            "Basic analytics",
+            "Manual deployments",
+            "Community support"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For professionals and small teams",
+          "features": [
+            "Unlimited projects",
+            "Up to 5 team members",
+            "Advanced analytics",
+            "Automatic deployments",
+            "Custom domains",
+            "Priority support"
+          ]
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "description": "For large teams and organizations",
+          "features": [
+            "Unlimited projects",
+            "Unlimited team members",
+            "Enterprise-grade analytics",
+            "Automatic deployments",
+            "Custom domains",
+            "SSO Authentication",
+            "Dedicated support",
+            "SLA guarantees"
+          ]
+        }
+      },
+      "popular": "Most Popular",
+      "month": "/month"
+    },
+    "docs": {
+      "badge": "Documentation",
+      "title": "Comprehensive Documentation",
+      "description": "Everything you need to get started and make the most of DeployHub",
+      "gettingStarted": {
+        "title": "Getting Started",
+        "description": "Learn how to set up your first project in minutes",
+        "items": ["Creating an account", "Connecting your GitHub repository", "Deploying your first project"],
+        "cta": "Read Guide"
+      },
+      "api": {
+        "title": "API Reference",
+        "description": "Integrate DeployHub into your workflow with our API",
+        "items": ["Authentication", "Projects API", "Deployments API"],
+        "cta": "View API Docs"
+      }
+    },
+    "testimonials": {
+      "badge": "Customer Stories",
+      "title": "Loved by developers worldwide",
+      "description": "See what our customers have to say about their experience with DeployHub"
+    },
+    "cta": {
+      "title": "Ready to transform your deployment workflow?",
+      "description": "Join thousands of developers who have simplified their deployment process with DeployHub. Get started for free today.",
+      "steps": {
+        "signup": {
+          "title": "Sign Up",
+          "description": "Create your account in seconds with GitHub authentication"
+        },
+        "connect": {
+          "title": "Connect Repository",
+          "description": "Link your GitHub repository with a single click"
+        },
+        "deploy": {
+          "title": "Deploy",
+          "description": "Push your code and watch it go live in seconds"
+        }
+      }
+    },
+    "footer": {
+      "rights": "All rights reserved.",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    }
+  },
+  "dashboard": {
+    "projects": "Projects",
+    "newProject": "New Project",
+    "allProjects": "All Projects",
+    "recentlyUpdated": "Recently Updated",
+    "favorites": "Favorites",
+    "noProjects": "You don't have any projects yet.",
+    "liveAt": "Live at:",
+    "building": "Building...",
+    "updated": "Updated",
+    "settings": "Account Settings",
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Mark all as read",
+      "viewAll": "View all notifications",
+      "noNotifications": "No notifications",
+      "unread": "unread"
+    }
+  },
+  "newProject": {
+    "title": "Create a New Project",
+    "description": "Select a GitHub repository to deploy. We'll automatically detect the framework and build settings.",
+    "searchPlaceholder": "Search repositories...",
+    "noRepos": {
+      "title": "No repositories found",
+      "description": "We couldn't find any repositories matching your search."
+    },
+    "configure": {
+      "title": "Configure Project",
+      "description": "Configure your project settings before deployment.",
+      "framework": {
+        "label": "Framework",
+        "description": "We've detected the following framework for your project."
+      },
+      "rootDir": {
+        "label": "Root Directory",
+        "description": "The directory where your project is located."
+      }
+    },
+    "deploying": {
+      "title": "Deploying Project",
+      "description": "We're setting up your project. This may take a few minutes.",
+      "steps": {
+        "cloning": "Cloning repository",
+        "installing": "Installing dependencies",
+        "building": "Building project",
+        "deploying": "Deploying to production"
+      },
+      "success": {
+        "title": "Deployment Successful!",
+        "description": "Your project has been deployed and is now live.",
+        "viewProject": "View Project"
+      }
+    }
+  },
+  "settings": {
+    "title": "Account Settings",
+    "description": "Manage your account settings and preferences",
+    "tabs": {
+      "profile": "Profile",
+      "connections": "Connections",
+      "notifications": "Notifications"
+    },
+    "profile": {
+      "title": "Profile Information",
+      "description": "Update your profile information and avatar",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "changeAvatar": "Change Avatar"
+    },
+    "connections": {
+      "title": "Connected Accounts",
+      "description": "Manage your connected accounts and services",
+      "github": {
+        "title": "GitHub",
+        "connected": "Connected to github.com/",
+        "notConnected": "Not connected",
+        "connect": "Connect",
+        "disconnect": "Disconnect"
+      }
+    },
+    "notifications": {
+      "title": "Notification Preferences",
+      "description": "Manage how and when you receive notifications",
+      "email": {
+        "title": "Email Notifications",
+        "description": "Receive notifications via email"
+      },
+      "deployment": {
+        "title": "Deployment Notifications",
+        "description": "Get notified when deployments succeed or fail"
+      },
+      "marketing": {
+        "title": "Marketing Emails",
+        "description": "Receive updates about new features and offers"
+      }
+    }
+  },
+  "projectDetails": {
+    "backToProjects": "Back to Projects",
+    "redeploy": "Redeploy",
+    "projectSettings": "Project Settings",
+    "deleteProject": "Delete Project",
+    "domains": {
+      "title": "Domains",
+      "description": "Configure the domains for your project",
+      "productionDomain": "Production domain",
+      "visit": "Visit",
+      "addCustomDomain": "Add Custom Domain",
+      "enterCustomDomain": "Enter custom domain"
+    },
+    "deployments": {
+      "title": "Recent Deployments",
+      "description": "View your recent deployment history",
+      "production": "Production",
+      "preview": "Preview",
+      "viewLogs": "View Logs"
+    },
+    "logs": {
+      "title": "Deployment Logs",
+      "description": "View the logs for your latest deployment",
+      "buildLogs": "Build Logs",
+      "runtimeLogs": "Runtime Logs"
+    }
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "signInDescription": "Sign in to your account to access your projects",
+    "signInWithGithub": "Sign in with GitHub",
+    "signingIn": "Signing in...",
+    "orContinueWith": "Or continue with",
+    "google": "Google",
+    "email": "Email",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "termsNotice": "By signing in, you agree to our",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy"
+  },
+  "language": {
+    "en": "English",
+    "zh-CN": "简体中文"
+  }
+}

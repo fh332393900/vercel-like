@@ -1,0 +1,306 @@
+{
+  "common": {
+    "appName": "DeployHub",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "logout": "Déconnexion",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "continue": "Continuer",
+    "save": "Enregistrer les modifications",
+    "deploy": "Déployer",
+    "view": "Voir",
+    "read": "Lire",
+    "features": "Fonctionnalités",
+    "pricing": "Tarification",
+    "documentation": "Documentation",
+    "getStarted": "Commencer",
+    "startFree": "Commencer gratuitement",
+    "startTrial": "Essai de 14 jours",
+    "contactSales": "Contacter les ventes"
+  },
+  "home": {
+    "hero": {
+      "badge": "Plateforme de déploiement transparente",
+      "title": "Déployez votre code en toute confiance",
+      "description": "Livrez vos projets plus rapidement grâce à notre intégration GitHub transparente et nos déploiements instantanés.",
+      "getStarted": "Commencer",
+      "readDocs": "Lire la documentation"
+    },
+    "trustedBy": {
+      "title": "Approuvé par des équipes innovantes du monde entier",
+      "description": "Rejoignez des milliers d'entreprises qui déploient des millions de projets avec DeployHub",
+      "stats": {
+        "projects": "Projets déployés",
+        "developers": "Développeurs satisfaits",
+        "uptime": "Disponibilité",
+        "responseTime": "Temps de réponse moyen"
+      }
+    },
+    "features": {
+      "badge": "Fonctionnalités puissantes",
+      "title": "Fonctionnalités puissantes",
+      "description": "Tout ce dont vous avez besoin pour déployer et gérer vos projets facilement",
+      "github": {
+        "title": "Intégration GitHub",
+        "description": "Connectez vos dépôts GitHub et déployez en un seul clic"
+      },
+      "instant": {
+        "title": "Déploiements instantanés",
+        "description": "Poussez vers votre dépôt et voyez vos changements en direct en quelques secondes"
+      },
+      "framework": {
+        "title": "Indépendant du framework",
+        "description": "Support pour tous les frameworks majeurs et générateurs de sites statiques"
+      }
+    },
+    "edge": {
+      "badge": "Réseau Edge mondial",
+      "title": "Déployez sur l'Edge",
+      "description": "Vos applications sont déployées sur notre réseau edge mondial, garantissant des temps de chargement rapides pour les utilisateurs partout dans le monde.",
+      "features": {
+        "cdn": "CDN mondial avec 99,99% de disponibilité",
+        "ssl": "Certificats SSL automatiques",
+        "ddos": "Protection DDoS incluse"
+      }
+    },
+    "pricing": {
+      "badge": "Tarification simple",
+      "title": "Choisissez le forfait parfait pour vos besoins",
+      "description": "Pas de frais cachés. Pas de surprises. Évoluez à mesure que vous grandissez.",
+      "plans": {
+        "hobby": {
+          "name": "Hobby",
+          "description": "Parfait pour les projets personnels et les expériences",
+          "features": [
+            "Jusqu'à 3 projets",
+            "1 membre d'équipe",
+            "Analyses de base",
+            "Déploiements manuels",
+            "Support communautaire"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "Pour les professionnels et les petites équipes",
+          "features": [
+            "Projets illimités",
+            "Jusqu'à 5 membres d'équipe",
+            "Analyses avancées",
+            "Déploiements automatiques",
+            "Domaines personnalisés",
+            "Support prioritaire"
+          ]
+        },
+        "enterprise": {
+          "name": "Entreprise",
+          "description": "Pour les grandes équipes et organisations",
+          "features": [
+            "Projets illimités",
+            "Membres d'équipe illimités",
+            "Analyses de niveau entreprise",
+            "Déploiements automatiques",
+            "Domaines personnalisés",
+            "Authentification SSO",
+            "Support dédié",
+            "Garanties SLA"
+          ]
+        }
+      },
+      "popular": "Le plus populaire",
+      "month": "/mois"
+    },
+    "docs": {
+      "badge": "Documentation",
+      "title": "Documentation complète",
+      "description": "Tout ce dont vous avez besoin pour commencer et tirer le meilleur parti de DeployHub",
+      "gettingStarted": {
+        "title": "Premiers pas",
+        "description": "Apprenez à configurer votre premier projet en quelques minutes",
+        "items": ["Création d'un compte", "Connexion de votre dépôt GitHub", "Déploiement de votre premier projet"],
+        "cta": "Lire le guide"
+      },
+      "api": {
+        "title": "Référence API",
+        "description": "Intégrez DeployHub dans votre flux de travail avec notre API",
+        "items": ["Authentification", "API Projets", "API Déploiements"],
+        "cta": "Voir la documentation API"
+      }
+    },
+    "testimonials": {
+      "badge": "Témoignages clients",
+      "title": "Aimé par les développeurs du monde entier",
+      "description": "Découvrez ce que nos clients disent de leur expérience avec DeployHub"
+    },
+    "cta": {
+      "title": "Prêt à transformer votre flux de déploiement ?",
+      "description": "Rejoignez des milliers de développeurs qui ont simplifié leur processus de déploiement avec DeployHub. Commencez gratuitement aujourd'hui.",
+      "steps": {
+        "signup": {
+          "title": "Inscription",
+          "description": "Créez votre compte en quelques secondes avec l'authentification GitHub"
+        },
+        "connect": {
+          "title": "Connecter le dépôt",
+          "description": "Liez votre dépôt GitHub en un seul clic"
+        },
+        "deploy": {
+          "title": "Déployer",
+          "description": "Poussez votre code et regardez-le devenir actif en quelques secondes"
+        }
+      }
+    },
+    "footer": {
+      "rights": "Tous droits réservés.",
+      "terms": "Conditions",
+      "privacy": "Confidentialité"
+    }
+  },
+  "dashboard": {
+    "projects": "Projets",
+    "newProject": "Nouveau projet",
+    "allProjects": "Tous les projets",
+    "recentlyUpdated": "Récemment mis à jour",
+    "favorites": "Favoris",
+    "noProjects": "Vous n'avez pas encore de projets.",
+    "liveAt": "En direct sur :",
+    "building": "En construction...",
+    "updated": "Mis à jour",
+    "settings": "Paramètres du compte",
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Marquer tout comme lu",
+      "viewAll": "Voir toutes les notifications",
+      "noNotifications": "Pas de notifications",
+      "unread": "non lu"
+    }
+  },
+  "newProject": {
+    "title": "Créer un nouveau projet",
+    "description": "Sélectionnez un dépôt GitHub à déployer. Nous détecterons automatiquement le framework et les paramètres de build.",
+    "searchPlaceholder": "Rechercher des dépôts...",
+    "noRepos": {
+      "title": "Aucun dépôt trouvé",
+      "description": "Nous n'avons trouvé aucun dépôt correspondant à votre recherche."
+    },
+    "configure": {
+      "title": "Configurer le projet",
+      "description": "Configurez les paramètres de votre projet avant le déploiement.",
+      "framework": {
+        "label": "Framework",
+        "description": "Nous avons détecté le framework suivant pour votre projet."
+      },
+      "rootDir": {
+        "label": "Répertoire racine",
+        "description": "Le répertoire où se trouve votre projet."
+      }
+    },
+    "deploying": {
+      "title": "Déploiement du projet",
+      "description": "Nous configurons votre projet. Cela peut prendre quelques minutes.",
+      "steps": {
+        "cloning": "Clonage du dépôt",
+        "installing": "Installation des dépendances",
+        "building": "Construction du projet",
+        "deploying": "Déploiement en production"
+      },
+      "success": {
+        "title": "Déploiement réussi !",
+        "description": "Votre projet a été déployé et est maintenant en ligne.",
+        "viewProject": "Voir le projet"
+      }
+    }
+  },
+  "settings": {
+    "title": "Paramètres du compte",
+    "description": "Gérez vos paramètres et préférences de compte",
+    "tabs": {
+      "profile": "Profil",
+      "connections": "Connexions",
+      "notifications": "Notifications"
+    },
+    "profile": {
+      "title": "Informations du profil",
+      "description": "Mettez à jour vos informations de profil et votre avatar",
+      "fullName": "Nom complet",
+      "email": "Adresse e-mail",
+      "changeAvatar": "Changer d'avatar"
+    },
+    "connections": {
+      "title": "Comptes connectés",
+      "description": "Gérez vos comptes et services connectés",
+      "github": {
+        "title": "GitHub",
+        "connected": "Connecté à github.com/",
+        "notConnected": "Non connecté",
+        "connect": "Connecter",
+        "disconnect": "Déconnecter"
+      }
+    },
+    "notifications": {
+      "title": "Préférences de notification",
+      "description": "Gérez comment et quand vous recevez des notifications",
+      "email": {
+        "title": "Notifications par e-mail",
+        "description": "Recevez des notifications par e-mail"
+      },
+      "deployment": {
+        "title": "Notifications de déploiement",
+        "description": "Soyez notifié lorsque les déploiements réussissent ou échouent"
+      },
+      "marketing": {
+        "title": "E-mails marketing",
+        "description": "Recevez des mises à jour sur les nouvelles fonctionnalités et offres"
+      }
+    }
+  },
+  "projectDetails": {
+    "backToProjects": "Retour aux projets",
+    "redeploy": "Redéployer",
+    "projectSettings": "Paramètres du projet",
+    "deleteProject": "Supprimer le projet",
+    "domains": {
+      "title": "Domaines",
+      "description": "Configurez les domaines pour votre projet",
+      "productionDomain": "Domaine de production",
+      "visit": "Visiter",
+      "addCustomDomain": "Ajouter un domaine personnalisé",
+      "enterCustomDomain": "Entrez un domaine personnalisé"
+    },
+    "deployments": {
+      "title": "Déploiements récents",
+      "description": "Consultez l'historique de vos déploiements récents",
+      "production": "Production",
+      "preview": "Aperçu",
+      "viewLogs": "Voir les logs"
+    },
+    "logs": {
+      "title": "Logs de déploiement",
+      "description": "Consultez les logs de votre dernier déploiement",
+      "buildLogs": "Logs de build",
+      "runtimeLogs": "Logs d'exécution"
+    }
+  },
+  "auth": {
+    "welcomeBack": "Bienvenue",
+    "signInDescription": "Connectez-vous à votre compte pour accéder à vos projets",
+    "signInWithGithub": "Se connecter avec GitHub",
+    "signingIn": "Connexion en cours...",
+    "orContinueWith": "Ou continuer avec",
+    "google": "Google",
+    "email": "Email",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "signUp": "S'inscrire",
+    "termsNotice": "En vous connectant, vous acceptez nos",
+    "termsOfService": "Conditions d'utilisation",
+    "and": "et",
+    "privacyPolicy": "Politique de confidentialité"
+  },
+  "language": {
+    "en": "English",
+    "fr": "Français",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  }
+}

@@ -1,0 +1,293 @@
+{
+  "common": {
+    "appName": "DeployHub",
+    "login": "登入",
+    "signup": "註冊",
+    "logout": "登出",
+    "back": "返回",
+    "cancel": "取消",
+    "continue": "繼續",
+    "save": "儲存變更",
+    "deploy": "部署",
+    "view": "查看",
+    "read": "閱讀",
+    "features": "功能",
+    "pricing": "價格",
+    "documentation": "文件",
+    "getStarted": "開始使用",
+    "startFree": "免費開始",
+    "startTrial": "開始14天試用",
+    "contactSales": "聯繫銷售"
+  },
+  "home": {
+    "hero": {
+      "badge": "無縫部署平台",
+      "title": "自信部署您的程式碼",
+      "description": "透過我們的無縫GitHub整合和即時部署，更快地發布您的專案。",
+      "getStarted": "開始使用",
+      "readDocs": "閱讀文件"
+    },
+    "trustedBy": {
+      "title": "全球創新團隊的信賴之選",
+      "description": "加入使用DeployHub部署數百萬個專案的數千家公司",
+      "stats": {
+        "projects": "已部署專案",
+        "developers": "滿意的開發者",
+        "uptime": "正常運行時間",
+        "responseTime": "平均回應時間"
+      }
+    },
+    "features": {
+      "badge": "強大功能",
+      "title": "強大功能",
+      "description": "輕鬆部署和管理專案所需的一切",
+      "github": {
+        "title": "GitHub整合",
+        "description": "連接您的GitHub儲存庫並一鍵部署"
+      },
+      "instant": {
+        "title": "即時部署",
+        "description": "推送到您的儲存庫，幾秒鐘內即可看到您的更改上線"
+      },
+      "framework": {
+        "title": "框架無關",
+        "description": "支援所有主要框架和靜態網站生成器"
+      }
+    },
+    "edge": {
+      "badge": "全球邊緣網路",
+      "title": "部署到邊緣",
+      "description": "您的應用程式部署在我們的全球邊緣網路上，確保世界各地的用戶都能快速載入。",
+      "features": {
+        "cdn": "全球CDN，99.99%正常運行時間",
+        "ssl": "自動SSL憑證",
+        "ddos": "包含DDoS保護"
+      }
+    },
+    "pricing": {
+      "badge": "簡單定價",
+      "title": "選擇適合您需求的完美方案",
+      "description": "沒有隱藏費用。沒有驚喜。隨著您的成長而擴展。",
+      "plans": {
+        "hobby": {
+          "name": "愛好者",
+          "description": "適合個人專案和實驗",
+          "features": ["最多3個專案", "1個團隊成員", "基本分析", "手動部署", "社區支援"]
+        },
+        "pro": {
+          "name": "專業版",
+          "description": "適合專業人士和小型團隊",
+          "features": ["無限專案", "最多5個團隊成員", "進階分析", "自動部署", "自訂網域", "優先支援"]
+        },
+        "enterprise": {
+          "name": "企業版",
+          "description": "適合大型團隊和組織",
+          "features": [
+            "無限專案",
+            "無限團隊成員",
+            "企業級分析",
+            "自動部署",
+            "自訂網域",
+            "SSO認證",
+            "專屬支援",
+            "SLA保證"
+          ]
+        }
+      },
+      "popular": "最受歡迎",
+      "month": "/月"
+    },
+    "docs": {
+      "badge": "文件",
+      "title": "全面的文件",
+      "description": "開始使用並充分利用DeployHub所需的一切",
+      "gettingStarted": {
+        "title": "入門指南",
+        "description": "了解如何在幾分鐘內設置您的第一個專案",
+        "items": ["創建帳戶", "連接您的GitHub儲存庫", "部署您的第一個專案"],
+        "cta": "閱讀指南"
+      },
+      "api": {
+        "title": "API參考",
+        "description": "使用我們的API將DeployHub整合到您的工作流程中",
+        "items": ["認證", "專案API", "部署API"],
+        "cta": "查看API文件"
+      }
+    },
+    "testimonials": {
+      "badge": "客戶故事",
+      "title": "全球開發者的喜愛",
+      "description": "看看我們的客戶對DeployHub體驗的評價"
+    },
+    "cta": {
+      "title": "準備好改變您的部署工作流程了嗎？",
+      "description": "加入數千名已經簡化部署流程的開發者。今天免費開始使用DeployHub。",
+      "steps": {
+        "signup": {
+          "title": "註冊",
+          "description": "使用GitHub認證幾秒鐘內創建您的帳戶"
+        },
+        "connect": {
+          "title": "連接儲存庫",
+          "description": "一鍵連結您的GitHub儲存庫"
+        },
+        "deploy": {
+          "title": "部署",
+          "description": "推送您的程式碼，幾秒鐘內即可上線"
+        }
+      }
+    },
+    "footer": {
+      "rights": "保留所有權利。",
+      "terms": "條款",
+      "privacy": "隱私"
+    }
+  },
+  "dashboard": {
+    "projects": "專案",
+    "newProject": "新專案",
+    "allProjects": "所有專案",
+    "recentlyUpdated": "最近更新",
+    "favorites": "收藏",
+    "noProjects": "您還沒有任何專案。",
+    "liveAt": "在線地址：",
+    "building": "構建中...",
+    "updated": "更新於",
+    "settings": "帳戶設定",
+    "notifications": {
+      "title": "通知",
+      "markAllRead": "標記所有為已讀",
+      "viewAll": "查看所有通知",
+      "noNotifications": "沒有通知",
+      "unread": "未讀"
+    }
+  },
+  "newProject": {
+    "title": "創建新專案",
+    "description": "選擇要部署的GitHub儲存庫。我們將自動檢測框架和構建設定。",
+    "searchPlaceholder": "搜索儲存庫...",
+    "noRepos": {
+      "title": "未找到儲存庫",
+      "description": "我們找不到與您搜索匹配的任何儲存庫。"
+    },
+    "configure": {
+      "title": "配置專案",
+      "description": "在部署前配置您的專案設定。",
+      "framework": {
+        "label": "框架",
+        "description": "我們已為您的專案檢測到以下框架。"
+      },
+      "rootDir": {
+        "label": "根目錄",
+        "description": "您專案所在的目錄。"
+      }
+    },
+    "deploying": {
+      "title": "部署專案",
+      "description": "我們正在設置您的專案。這可能需要幾分鐘。",
+      "steps": {
+        "cloning": "克隆儲存庫",
+        "installing": "安裝依賴",
+        "building": "構建專案",
+        "deploying": "部署到生產環境"
+      },
+      "success": {
+        "title": "部署成功！",
+        "description": "您的專案已部署並上線。",
+        "viewProject": "查看專案"
+      }
+    }
+  },
+  "settings": {
+    "title": "帳戶設定",
+    "description": "管理您的帳戶設定和偏好",
+    "tabs": {
+      "profile": "個人資料",
+      "connections": "連接",
+      "notifications": "通知"
+    },
+    "profile": {
+      "title": "個人資料信息",
+      "description": "更新您的個人資料信息和頭像",
+      "fullName": "全名",
+      "email": "電子郵箱",
+      "changeAvatar": "更改頭像"
+    },
+    "connections": {
+      "title": "已連接帳戶",
+      "description": "管理您的已連接帳戶和服務",
+      "github": {
+        "title": "GitHub",
+        "connected": "已連接到github.com/",
+        "notConnected": "未連接",
+        "connect": "連接",
+        "disconnect": "斷開連接"
+      }
+    },
+    "notifications": {
+      "title": "通知偏好",
+      "description": "管理您接收通知的方式和時間",
+      "email": {
+        "title": "電子郵件通知",
+        "description": "通過電子郵件接收通知"
+      },
+      "deployment": {
+        "title": "部署通知",
+        "description": "在部署成功或失敗時獲得通知"
+      },
+      "marketing": {
+        "title": "營銷郵件",
+        "description": "接收有關新功能和優惠的更新"
+      }
+    }
+  },
+  "projectDetails": {
+    "backToProjects": "返回專案",
+    "redeploy": "重新部署",
+    "projectSettings": "專案設定",
+    "deleteProject": "刪除專案",
+    "domains": {
+      "title": "網域",
+      "description": "配置您專案的網域",
+      "productionDomain": "生產網域",
+      "visit": "訪問",
+      "addCustomDomain": "添加自訂網域",
+      "enterCustomDomain": "輸入自訂網域"
+    },
+    "deployments": {
+      "title": "最近部署",
+      "description": "查看您最近的部署歷史",
+      "production": "生產環境",
+      "preview": "預覽",
+      "viewLogs": "查看日誌"
+    },
+    "logs": {
+      "title": "部署日誌",
+      "description": "查看您最新部署的日誌",
+      "buildLogs": "構建日誌",
+      "runtimeLogs": "運行時日誌"
+    }
+  },
+  "auth": {
+    "welcomeBack": "歡迎回來",
+    "signInDescription": "登入您的帳戶以訪問您的專案",
+    "signInWithGithub": "使用GitHub登入",
+    "signingIn": "登入中...",
+    "orContinueWith": "或繼續使用",
+    "google": "Google",
+    "email": "電子郵箱",
+    "noAccount": "沒有帳戶？",
+    "signUp": "註冊",
+    "termsNotice": "登入即表示您同意我們的",
+    "termsOfService": "服務條款",
+    "and": "和",
+    "privacyPolicy": "隱私政策"
+  },
+  "language": {
+    "en": "English",
+    "fr": "Français",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  }
+}

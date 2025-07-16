@@ -1,0 +1,342 @@
+{
+  "common": {
+    "appName": "DeployHub",
+    "login": "ログイン",
+    "signup": "サインアップ",
+    "logout": "ログアウト",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "continue": "続ける",
+    "save": "変更を保存",
+    "deploy": "デプロイ",
+    "view": "表示",
+    "read": "読む",
+    "features": "機能",
+    "pricing": "料金",
+    "documentation": "ドキュメント",
+    "getStarted": "始める",
+    "startFree": "無料で始める",
+    "startTrial": "14日間の試用を開始",
+    "contactSales": "営業に問い合わせる"
+  },
+  "home": {
+    "hero": {
+      "badge": "シームレスなデプロイプラットフォーム",
+      "title": "自信を持ってコードをデプロイ",
+      "description": "シームレスなGitHub連携と即時デプロイで、プロジェクトをより速く公開できます。",
+      "getStarted": "始める",
+      "readDocs": "ドキュメントを読む"
+    },
+    "trustedBy": {
+      "title": "世界中の革新的なチームに信頼されています",
+      "description": "DeployHubで何百万ものプロジェクトをデプロイしている何千もの企業に参加しましょう",
+      "stats": {
+        "projects": "デプロイされたプロジェクト",
+        "developers": "満足している開発者",
+        "uptime": "稼働時間",
+        "responseTime": "平均応答時間"
+      }
+    },
+    "features": {
+      "badge": "強力な機能",
+      "title": "強力な機能",
+      "description": "プロジェクトを簡単にデプロイおよび管理するために必要なすべて",
+      "github": {
+        "title": "GitHub連携",
+        "description": "GitHubリポジトリを接続し、ワンクリックでデプロイ"
+      },
+      "instant": {
+        "title": "即時デプロイ",
+        "description": "リポジトリにプッシュすると、数秒で変更がライブになります"
+      },
+      "framework": {
+        "title": "フレームワーク非依存",
+        "description": "すべての主要フレームワークと静的サイトジェネレーターをサポート"
+      }
+    },
+    "edge": {
+      "badge": "グローバルエッジネットワーク",
+      "title": "エッジにデプロイ",
+      "description": "アプリケーションは当社のグローバルエッジネットワークにデプロイされ、世界中のユーザーに高速な読み込み時間を保証します。",
+      "features": {
+        "cdn": "99.99%の稼働時間を持つグローバルCDN",
+        "ssl": "自動SSL証明書",
+        "ddos": "DDoS保護を含む"
+      }
+    },
+    "pricing": {
+      "badge": "シンプルな料金",
+      "title": "あなたのニーズに合った完璧なプランを選択",
+      "description": "隠れた料金はありません。驚きもありません。成長に合わせてスケールします。",
+      "plans": {
+        "hobby": {
+          "name": "ホビー",
+          "description": "個人プロジェクトや実験に最適",
+          "features": [
+            "最大3つのプロジェクト",
+            "1チームメンバー",
+            "基本的な分析",
+            "手動デプロイ",
+            "コミュニティサポート"
+          ]
+        },
+        "pro": {
+          "name": "プロ",
+          "description": "プロフェッショナルや小規模チーム向け",
+          "features": [
+            "無制限のプロジェクト",
+            "最大5チームメンバー",
+            "高度な分析",
+            "自動デプロイ",
+            "カスタムドメイン",
+            "優先サポート"
+          ]
+        },
+        "enterprise": {
+          "name": "エンタープライズ",
+          "description": "大規模チームや組織向け",
+          "features": [
+            "無制限のプロジェクト",
+            "無制限のチームメンバー",
+            "エンタープライズグレードの分析",
+            "自動デプロイ",
+            "カスタムドメイン",
+            "SSO認証",
+            "専任サポート",
+            "SLA保証"
+          ]
+        }
+      },
+      "popular": "最も人気",
+      "month": "/月"
+    },
+    "docs": {
+      "badge": "ドキュメント",
+      "title": "包括的なドキュメント",
+      "description": "DeployHubを始めて最大限に活用するために必要なすべて",
+      "gettingStarted": {
+        "title": "はじめに",
+        "description": "数分で最初のプロジェクトをセットアップする方法を学ぶ",
+        "items": ["アカウントの作成", "GitHubリポジトリの接続", "最初のプロジェクトのデプロイ"],
+        "cta": "ガイドを読む"
+      },
+      "api": {
+        "title": "APIリファレンス",
+        "description": "当社のAPIを使用してDeployHubをワークフローに統合",
+        "items": ["認証", "プロジェクトAPI", "デプロイメントAPI"],
+        "cta": "APIドキュメントを見る"
+      }
+    },
+    "testimonials": {
+      "badge": "お客様の声",
+      "title": "世界中の開発者に愛されています",
+      "description": "DeployHubでの経験についてお客様の声をご覧ください"
+    },
+    "cta": {
+      "title": "デプロイワークフローを変革する準備はできていますか？",
+      "description": "DeployHubでデプロイプロセスを簡素化した何千もの開発者に参加しましょう。今日から無料で始めましょう。",
+      "steps": {
+        "signup": {
+          "title": "サインアップ",
+          "description": "GitHub認証で数秒でアカウントを作成"
+        },
+        "connect": {
+          "title": "リポジトリを接続",
+          "description": "ワンクリックでGitHubリポジトリをリンク"
+        },
+        "deploy": {
+          "title": "デプロイ",
+          "description": "コードをプッシュして、数秒でライブになるのを確認"
+        }
+      }
+    },
+    "footer": {
+      "rights": "All rights reserved.",
+      "terms": "利用規約",
+      "privacy": "プライバシー"
+    }
+  },
+  "dashboard": {
+    "projects": "プロジェクト",
+    "newProject": "新しいプロジェクト",
+    "allProjects": "すべてのプロジェクト",
+    "recentlyUpdated": "最近更新された",
+    "favorites": "お気に入り",
+    "noProjects": "まだプロジェクトがありません。",
+    "liveAt": "ライブ：",
+    "building": "ビルド中...",
+    "updated": "更新日時",
+    "settings": "アカウント設定",
+    "notifications": {
+      "title": "通知",
+      "markAllRead": "すべて既読にする",
+      "viewAll": "すべての通知を表示",
+      "noNotifications": "通知はありません",
+      "unread": "未読"
+    }
+  },
+  "newProject": {
+    "title": "新しいプロジェクトを作成",
+    "description": "デプロイするGitHubリポジトリを選択してください。フレームワークとビルド設定を自動的に検出します。",
+    "searchPlaceholder": "リポジトリを検索...",
+    "noRepos": {
+      "title": "リポジトリが見つかりません",
+      "description": "検索に一致するリポジトリが見つかりませんでした。"
+    },
+    "configure": {
+      "title": "プロジェクトを構成",
+      "description": "デプロイ前にプロジェクト設定を構成します。",
+      "framework": {
+        "label": "フレームワーク",
+        "description": "プロジェクトに次のフレームワークを検出しました。"
+      },
+      "rootDir": {
+        "label": "ルートディレクトリ",
+        "description": "プロジェクトが配置されているディレクトリ。"
+      }
+    },
+    "deploying": {
+      "title": "プロジェクトをデプロイ中",
+      "description": "プロジェクトをセットアップしています。これには数分かかる場合があります。",
+      "steps": {
+        "cloning": "リポジトリをクローン中",
+        "installing": "依存関係をインストール中",
+        "building": "プロジェクトをビルド中",
+        "deploying": "本番環境にデプロイ中"
+      },
+      "success": {
+        "title": "デプロイ成功！",
+        "description": "プロジェクトがデプロイされ、現在ライブです。",
+        "viewProject": "プロジェクトを表示"
+      }
+    }
+  },
+  "newProject": {
+    "title": "新しいプロジェクトを作成",
+    "description": "デプロイするGitHubリポジトリを選択してください。フレームワークとビルド設定を自動的に検出します。",
+    "searchPlaceholder": "リポジトリを検索...",
+    "noRepos": {
+      "title": "リポジトリが見つかりません",
+      "description": "検索に一致するリポジトリが見つかりませんでした。"
+    },
+    "configure": {
+      "title": "プロジェクトを構成",
+      "description": "デプロイ前にプロジェクト設定を構成します。",
+      "framework": {
+        "label": "フレームワーク",
+        "description": "プロジェクトに次のフレームワークを検出しました。"
+      },
+      "rootDir": {
+        "label": "ルートディレクトリ",
+        "description": "プロジェクトが配置されているディレクトリ。"
+      }
+    },
+    "deploying": {
+      "title": "プロジェクトをデプロイ中",
+      "description": "プロジェクトをセットアップしています。これには数分かかる場合があります。",
+      "steps": {
+        "cloning": "リポジトリをクローン中",
+        "installing": "依存関係をインストール中",
+        "building": "プロジェクトをビルド中",
+        "deploying": "本番環境にデプロイ中"
+      },
+      "success": {
+        "title": "デプロイ成功！",
+        "description": "プロジェクトがデプロイされ、現在ライブです。",
+        "viewProject": "プロジェクトを表示"
+      }
+    }
+  },
+  "settings": {
+    "title": "アカウント設定",
+    "description": "アカウント設定と設定を管理する",
+    "tabs": {
+      "profile": "プロフィール",
+      "connections": "接続",
+      "notifications": "通知"
+    },
+    "profile": {
+      "title": "プロフィール情報",
+      "description": "プロフィール情報とアバターを更新する",
+      "fullName": "氏名",
+      "email": "メールアドレス",
+      "changeAvatar": "アバターを変更"
+    },
+    "connections": {
+      "title": "接続済みアカウント",
+      "description": "接続済みアカウントとサービスを管理する",
+      "github": {
+        "title": "GitHub",
+        "connected": "github.com/に接続済み",
+        "notConnected": "未接続",
+        "connect": "接続",
+        "disconnect": "切断"
+      }
+    },
+    "notifications": {
+      "title": "通知設定",
+      "description": "通知の受け取り方法と時期を管理する",
+      "email": {
+        "title": "メール通知",
+        "description": "メールで通知を受け取る"
+      },
+      "deployment": {
+        "title": "デプロイ通知",
+        "description": "デプロイの成功または失敗時に通知を受け取る"
+      },
+      "marketing": {
+        "title": "マーケティングメール",
+        "description": "新機能やオファーに関する更新を受け取る"
+      }
+    }
+  },
+  "projectDetails": {
+    "backToProjects": "プロジェクト一覧に戻る",
+    "redeploy": "再デプロイ",
+    "projectSettings": "プロジェクト設定",
+    "deleteProject": "プロジェクトを削除",
+    "domains": {
+      "title": "ドメイン",
+      "description": "プロジェクトのドメインを設定する",
+      "productionDomain": "本番ドメイン",
+      "visit": "訪問",
+      "addCustomDomain": "カスタムドメインを追加",
+      "enterCustomDomain": "カスタムドメインを入力"
+    },
+    "deployments": {
+      "title": "最近のデプロイ",
+      "description": "最近のデプロイ履歴を表示",
+      "production": "本番環境",
+      "preview": "プレビュー",
+      "viewLogs": "ログを表示"
+    },
+    "logs": {
+      "title": "デプロイログ",
+      "description": "最新のデプロイのログを表示",
+      "buildLogs": "ビルドログ",
+      "runtimeLogs": "ランタイムログ"
+    }
+  },
+  "auth": {
+    "welcomeBack": "おかえりなさい",
+    "signInDescription": "アカウントにサインインしてプロジェクトにアクセス",
+    "signInWithGithub": "GitHubでサインイン",
+    "signingIn": "サインイン中...",
+    "orContinueWith": "または次で続行",
+    "google": "Google",
+    "email": "メール",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "signUp": "サインアップ",
+    "termsNotice": "サインインすることで、当社の",
+    "termsOfService": "利用規約",
+    "and": "および",
+    "privacyPolicy": "プライバシーポリシー"
+  },
+  "language": {
+    "en": "English",
+    "fr": "Français",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  }
+}
