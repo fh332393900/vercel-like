@@ -88,7 +88,7 @@ export async function getSessionByToken(token: string) {
       SELECT s.id, s.user_id, s.token, s.expires_at, u.email, u.name, u.avatar_url, u.github_id, u.email_verified
       FROM sessions s
       JOIN users u ON s.user_id = u.id
-      WHERE s.token = ${token} AND s.expires_at > NOW()
+      WHERE s.id = ${token} AND s.expires_at > NOW()
     `
 
     console.log("Session query result:", session ? "found" : "not found")
