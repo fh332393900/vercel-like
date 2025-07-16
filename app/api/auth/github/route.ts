@@ -63,7 +63,11 @@ export async function GET(request: NextRequest) {
       }),
     })
 
+    console.error(tokenResponse. 'tokenResponse')
+
     const tokenData = await tokenResponse.json()
+
+    console.error(tokenData, '---------')
 
     if (tokenData.error) {
       console.error("GitHub token error:", tokenData.error_description)
