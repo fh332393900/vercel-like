@@ -1,39 +1,36 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+interface SessionDebugInfo {
+  authenticated: boolean
+  user: any
+  sessionCookie: string | null
+  sessionInfo: any
+  timestamp: string
+}
+
 export function SessionDebug() {
-  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [debugInfo, setDebugInfo] = useState<SessionDebugInfo | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const checkSession = async () => {
+  const fetchDebugInfo = async () => {
     setLoading(true)
     try {
       const response = await fetch("/api/debug/session")
       const data = await response.json()
       setDebugInfo(data)
     } catch (error) {
-      console.error("Debug error:", error)
+      console.error("Failed to fetch debug info:", error)
     } finally {
       setLoading(false)
     }
   }
 
-  const checkUserMe = async () => {
-    try {
-      const response = await fetch("/api/user/me")
-      const data = await response.json()
-      console.log("User me response:", data)
-      setDebugInfo((prev) => ({ ...prev, userMeResponse: data }))
-    } catch (error) {
-      console.error("User me error:", error)
-    }
-  }
-
   useEffect(() => {
-    checkSession()
+    fetchDebugInfo()
   }, [])
 
   if (process.env.NODE_ENV === "production") {
@@ -41,22 +38,41 @@ export function SessionDebug() {
   }
 
   return (
-    <Card className="mt-4">
+    <Card className="mt-8 border-yellow-200 bg-yellow-50">
       <CardHeader>
-        <CardTitle>Session Debug (Development Only)</CardTitle>
+        <CardTitle className="text-sm text-yellow-800">Session Debug Info</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Button onClick={checkSession} disabled={loading} size="sm">
-            Check Session
-          </Button>
-          <Button onClick={checkUserMe} size="sm" variant="outline">
-            Test /api/user/me
-          </Button>
-        </div>
+      <CardContent className="space-y-2">
+        <Button onClick={fetchDebugInfo} disabled={loading} size="sm">
+          {loading ? "Loading..." : "Refresh"}
+        </Button>
 
         {debugInfo && (
-          <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto">{JSON.stringify(debugInfo, null, 2)}</pre>
+          <div className="text-xs space-y-2">
+            <div>
+              <strong>Authenticated:</strong> {debugInfo.authenticated ? "Yes" : "No"}
+            </div>
+
+            {debugInfo.user && (
+              <div>
+                <strong>User:</strong> {debugInfo.user.name} ({debugInfo.user.email})
+              </div>
+            )}
+
+            <div>
+              <strong>Session Cookie:</strong> {debugInfo.sessionCookie || "None"}
+            </div>
+
+            {debugInfo.sessionInfo && (
+              <div>
+                <strong>Session DB:</strong> Expires {new Date(debugInfo.sessionInfo.expires_at).toLocaleString()}
+              </div>
+            )}
+
+            <div>
+              <strong>Timestamp:</strong> {new Date(debugInfo.timestamp).toLocaleString()}
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

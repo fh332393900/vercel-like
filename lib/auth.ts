@@ -1,219 +1,250 @@
-import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
-import {
-  createUser,
-  getUserByEmail,
-  getUserByGithubId,
-  createSession,
-  getSessionByToken,
-  deleteSession,
-  sql,
-} from "./db"
+import { sql } from "@/lib/db"
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
-const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 days
+const JWT_SECRET = process.env.JWT_SECRET!
 
 export interface User {
-  id: string
+  id: number
   email: string
   name: string
   avatar_url?: string
   github_id?: string
-  email_verified: boolean
+  created_at: Date
+  updated_at: Date
 }
 
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12)
+export interface SessionUser {
+  id: number
+  email: string
+  name: string
+  avatar_url?: string
 }
 
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword)
+// Create JWT token
+export function createToken(user: SessionUser): string {
+  return jwt.sign(
+    {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      avatar_url: user.avatar_url,
+    },
+    JWT_SECRET,
+    { expiresIn: "7d" },
+  )
 }
 
-export function generateToken(): string {
-  return jwt.sign({ timestamp: Date.now() }, JWT_SECRET)
-}
-
-export async function createUserSession(user: User): Promise<string> {
-  const token = generateToken()
-  const expiresAt = new Date(Date.now() + SESSION_DURATION)
-
-  console.log("Creating session for user:", user.id, "token:", token.substring(0, 10) + "...")
-
+// Verify JWT token
+export function verifyToken(token: string): SessionUser | null {
   try {
-    await createSession(user.id, token, expiresAt)
-    console.log("Session created in database")
-
-    // Set HTTP-only cookie
-    const cookieStore = await cookies()
-    cookieStore.set("session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      expires: expiresAt,
-      path: "/",
-    })
-
-    console.log("Session cookie set")
-    return token
+    const decoded = jwt.verify(token, JWT_SECRET) as any
+    return {
+      id: decoded.userId,
+      email: decoded.email,
+      name: decoded.name,
+      avatar_url: decoded.avatar_url,
+    }
   } catch (error) {
-    console.error("Error creating session:", error)
-    throw error
-  }
-}
-
-export async function getCurrentUser(): Promise<User | null> {
-  try {
-    const cookieStore = await cookies()
-    const sessionToken = cookieStore.get("session")?.value
-
-    console.log("Getting current user, session token:", sessionToken ? "exists" : "missing")
-
-    if (!sessionToken) {
-      console.log("No session token found")
-      return null
-    }
-
-    const session = await getSessionByToken(sessionToken)
-    console.log("Session query result:", session ? "found" : "not found")
-
-    if (!session) {
-      console.log("Session not found or expired")
-      return null
-    }
-
-    const user = {
-      id: session.user_id,
-      email: session.email,
-      name: session.name,
-      avatar_url: session.avatar_url,
-      github_id: session.github_id,
-      email_verified: session.email_verified,
-    }
-
-    console.log("Returning user:", { id: user.id, email: user.email })
-    return user
-  } catch (error) {
-    console.error("Error getting current user:", error)
+    console.error("Token verification failed:", error)
     return null
   }
 }
 
-export async function logout(): Promise<void> {
-  const cookieStore = await cookies()
-  const sessionToken = cookieStore.get("session")?.value
+// Create user session
+export async function createUserSession(user: SessionUser) {
+  const token = createToken(user)
+  const sessionId = crypto.randomUUID()
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
-  if (sessionToken) {
-    await deleteSession(sessionToken)
+  try {
+    // Store session in database
+    await sql`
+    INSERT INTO sessions (id, user_id, token, expires_at, created_at, updated_at)
+    VALUES (${sessionId}, ${user.id}, ${token}, ${expiresAt}, NOW(), NOW())
+    ON CONFLICT (id) DO UPDATE SET
+      token = EXCLUDED.token,
+      expires_at = EXCLUDED.expires_at,
+      updated_at = NOW()
+  `
+
+    // Set HTTP-only cookie
+    const cookieStore = await cookies()
+    cookieStore.set("session", sessionId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+      path: "/",
+    })
+
+    console.log("Session created successfully:", { sessionId, userId: user.id })
+  } catch (error) {
+    console.error("Failed to create session:", error)
+    throw new Error("Failed to create session")
   }
-
-  cookieStore.delete("session")
 }
 
-export async function registerUser(email: string, password: string, name: string): Promise<User> {
-  // Check if user already exists
-  const existingUser = await getUserByEmail(email)
-  if (existingUser) {
-    throw new Error("User already exists")
+// Get current user from session
+export async function getCurrentUser(): Promise<SessionUser | null> {
+  try {
+    const cookieStore = await cookies()
+    const sessionId = cookieStore.get("session")?.value
+
+    if (!sessionId) {
+      console.log("No session cookie found")
+      return null
+    }
+
+    // Get session from database
+    const sessions = await sql`
+    SELECT s.token, s.expires_at, u.id, u.email, u.name, u.avatar_url
+    FROM sessions s
+    JOIN users u ON s.user_id = u.id
+    WHERE s.id = ${sessionId} AND s.expires_at > NOW()
+  `
+
+    if (sessions.length === 0) {
+      console.log("No valid session found in database")
+      return null
+    }
+
+    const session = sessions[0]
+
+    // Verify token
+    const user = verifyToken(session.token)
+    if (!user) {
+      console.log("Token verification failed")
+      return null
+    }
+
+    console.log("User authenticated successfully:", { id: user.id, email: user.email })
+    return user
+  } catch (error) {
+    console.error("Failed to get current user:", error)
+    return null
+  }
+}
+
+// Login with email and password
+export async function loginUser(email: string, password: string): Promise<User> {
+  const users = await sql`
+  SELECT * FROM users WHERE email = ${email}
+`
+
+  if (users.length === 0) {
+    throw new Error("Invalid credentials")
   }
 
-  // Hash password
-  const passwordHash = await hashPassword(password)
+  const user = users[0] as User
 
-  // Create user
-  const user = await createUser({
-    email,
-    name,
-    passwordHash,
-  })
+  if (!user.password_hash) {
+    throw new Error("Please use GitHub login for this account")
+  }
+
+  const isValid = await bcrypt.compare(password, user.password_hash)
+  if (!isValid) {
+    throw new Error("Invalid credentials")
+  }
 
   return user
 }
 
-export async function loginUser(email: string, password: string): Promise<User> {
-  const user = await getUserByEmail(email)
+// Register new user
+export async function registerUser(email: string, password: string, name: string): Promise<User> {
+  // Check if user already exists
+  const existingUsers = await sql`
+  SELECT id FROM users WHERE email = ${email}
+`
 
-  if (!user || !user.password_hash) {
-    throw new Error("Invalid credentials")
+  if (existingUsers.length > 0) {
+    throw new Error("User already exists")
   }
 
-  const isValidPassword = await verifyPassword(password, user.password_hash)
+  // Hash password
+  const passwordHash = await bcrypt.hash(password, 12)
 
-  if (!isValidPassword) {
-    throw new Error("Invalid credentials")
-  }
+  // Create user
+  const users = await sql`
+  INSERT INTO users (email, password_hash, name, created_at, updated_at)
+  VALUES (${email}, ${passwordHash}, ${name}, NOW(), NOW())
+  RETURNING *
+`
 
-  return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    avatar_url: user.avatar_url,
-    github_id: user.github_id,
-    email_verified: user.email_verified,
-  }
+  return users[0] as User
 }
 
+// Login or create user with GitHub
 export async function loginWithGithub(githubUser: {
   id: string
   email: string
   name: string
   avatar_url: string
-  login?: string
+  login: string
 }): Promise<User> {
   try {
-    // Check if user exists by GitHub ID
-    let user = await getUserByGithubId(githubUser.id)
+    console.log("Attempting GitHub login for:", githubUser.email)
 
-    if (!user) {
-      // Check if user exists by email
-      user = await getUserByEmail(githubUser.email)
+    // Check if user exists by email or GitHub ID
+    const existingUsers = await sql`
+    SELECT * FROM users 
+    WHERE email = ${githubUser.email} OR github_id = ${githubUser.id}
+  `
 
-      if (user) {
-        // Update existing user with GitHub info
+    if (existingUsers.length > 0) {
+      const user = existingUsers[0] as User
+      console.log("Existing user found:", user.id)
+
+      // Update GitHub info if not set
+      if (!user.github_id) {
         await sql`
-          UPDATE users 
-          SET github_id = ${githubUser.id}, avatar_url = ${githubUser.avatar_url}, email_verified = true, updated_at = NOW()
-          WHERE id = ${user.id}
-        `
-
-        // Fetch updated user
-        user = await getUserByGithubId(githubUser.id)
-      } else {
-        // Create new user
-        user = await createUser({
-          email: githubUser.email,
-          name: githubUser.name,
-          githubId: githubUser.id,
-          avatarUrl: githubUser.avatar_url,
-        })
-      }
-    } else {
-      // Update existing GitHub user's info
-      await sql`
         UPDATE users 
-        SET name = ${githubUser.name}, avatar_url = ${githubUser.avatar_url}, email = ${githubUser.email}, updated_at = NOW()
-        WHERE github_id = ${githubUser.id}
+        SET github_id = ${githubUser.id}, 
+            avatar_url = ${githubUser.avatar_url},
+            updated_at = NOW()
+        WHERE id = ${user.id}
       `
+        console.log("Updated existing user with GitHub info")
+      }
 
-      // Fetch updated user
-      user = await getUserByGithubId(githubUser.id)
+      return user
     }
 
-    if (!user) {
-      throw new Error("Failed to create or update user")
-    }
+    // Create new user
+    console.log("Creating new user from GitHub data")
+    const newUsers = await sql`
+    INSERT INTO users (email, name, github_id, avatar_url, created_at, updated_at)
+    VALUES (${githubUser.email}, ${githubUser.name}, ${githubUser.id}, ${githubUser.avatar_url}, NOW(), NOW())
+    RETURNING *
+  `
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatar_url: user.avatar_url,
-      github_id: user.github_id,
-      email_verified: user.email_verified,
-    }
+    const newUser = newUsers[0] as User
+    console.log("New user created:", newUser.id)
+    return newUser
   } catch (error) {
-    console.error("Error in loginWithGithub:", error)
-    throw new Error("Failed to authenticate with GitHub")
+    console.error("GitHub login error:", error)
+    throw new Error("Failed to login with GitHub")
   }
 }
+
+// Logout user
+export async function logoutUser() {
+  try {
+    const cookieStore = await cookies()
+    const sessionId = cookieStore.get("session")?.value
+
+    if (sessionId) {
+      // Delete session from database
+      await sql`DELETE FROM sessions WHERE id = ${sessionId}`
+    }
+
+    // Clear cookie
+    cookieStore.delete("session")
+  } catch (error) {
+    console.error("Logout error:", error)
+  }
+}
+
+// Alias so other modules can import { logout }
+export const logout = logoutUser
