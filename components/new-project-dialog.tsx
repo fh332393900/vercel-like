@@ -13,6 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -87,12 +88,12 @@ const mockRepositories = [
 ]
 
 interface NewProjectDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  children?: React.ReactNode
   onProjectCreated?: (projectId: string) => void
 }
 
-export function NewProjectDialog({ open, onOpenChange, onProjectCreated }: NewProjectDialogProps) {
+export function NewProjectDialog({ children, onProjectCreated }: NewProjectDialogProps) {
+  const [open, setOpen] = useState(false)
   const [step, setStep] = useState<"select" | "configure" | "deploying">("select")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedRepo, setSelectedRepo] = useState<string | null>(null)
@@ -127,6 +128,21 @@ export function NewProjectDialog({ open, onOpenChange, onProjectCreated }: NewPr
     }
   }
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+    if (!newOpen) {
+      // Reset state when dialog closes
+      setTimeout(() => {
+        setStep("select")
+        setSelectedRepo(null)
+        setIsDeploying(false)
+        setDeploymentProgress(0)
+        setSearchQuery("")
+        setFramework("next")
+      }, 300)
+    }
+  }
+
   const startDeployment = () => {
     setIsDeploying(true)
     setDeploymentProgress(0)
@@ -142,14 +158,7 @@ export function NewProjectDialog({ open, onOpenChange, onProjectCreated }: NewPr
             if (onProjectCreated) {
               onProjectCreated("new-project-id")
             }
-            onOpenChange(false)
-            // Reset state for next time
-            setTimeout(() => {
-              setStep("select")
-              setSelectedRepo(null)
-              setIsDeploying(false)
-              setDeploymentProgress(0)
-            }, 500)
+            handleOpenChange(false)
           }, 1000)
           return 100
         }
@@ -161,7 +170,8 @@ export function NewProjectDialog({ open, onOpenChange, onProjectCreated }: NewPr
   const selectedRepository = mockRepositories.find((repo) => repo.id === selectedRepo)
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         {step === "select" && (
           <>
@@ -237,7 +247,7 @@ export function NewProjectDialog({ open, onOpenChange, onProjectCreated }: NewPr
               </ScrollArea>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" onClick={() => handleOpenChange(false)}>
                 Cancel
               </Button>
               <Button onClick={handleContinue} disabled={!selectedRepo}>
@@ -382,7 +392,7 @@ export function NewProjectDialog({ open, onOpenChange, onProjectCreated }: NewPr
                   <p className="text-center text-muted-foreground mb-4">
                     Your project has been deployed and is now live.
                   </p>
-                  <Button onClick={() => onOpenChange(false)}>View Project</Button>
+                  <Button onClick={() => handleOpenChange(false)}>View Project</Button>
                 </>
               )}
             </div>
