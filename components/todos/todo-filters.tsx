@@ -1,77 +1,39 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 
 interface TodoFiltersProps {
-  completedFilter: string | null
-  priorityFilter: string | null
-  onCompletedFilterChange: (value: string | null) => void
-  onPriorityFilterChange: (value: string | null) => void
-  totalCount: number
-  completedCount: number
+  statusFilter: string
+  priorityFilter: string
+  onStatusChange: (status: string) => void
+  onPriorityChange: (priority: string) => void
 }
 
-export function TodoFilters({
-  completedFilter,
-  priorityFilter,
-  onCompletedFilterChange,
-  onPriorityFilterChange,
-  totalCount,
-  completedCount,
-}: TodoFiltersProps) {
-  const clearFilters = () => {
-    onCompletedFilterChange(null)
-    onPriorityFilterChange(null)
-  }
-
-  const hasActiveFilters = completedFilter !== null || priorityFilter !== null
-
+export function TodoFilters({ statusFilter, priorityFilter, onStatusChange, onPriorityChange }: TodoFiltersProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-      <div className="flex items-center gap-2">
-        <Badge variant="outline">{totalCount} total</Badge>
-        <Badge variant="outline">{completedCount} completed</Badge>
-        <Badge variant="outline">{totalCount - completedCount} pending</Badge>
-      </div>
+    <div className="flex gap-4">
+      <Select value={statusFilter} onValueChange={onStatusChange}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Todos</SelectItem>
+          <SelectItem value="pending">Pending</SelectItem>
+          <SelectItem value="completed">Completed</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <div className="flex items-center gap-2">
-        <Select
-          value={completedFilter || "all"}
-          onValueChange={(value) => onCompletedFilterChange(value === "all" ? null : value)}
-        >
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="false">Pending</SelectItem>
-            <SelectItem value="true">Completed</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={priorityFilter || "all"}
-          onValueChange={(value) => onPriorityFilterChange(value === "all" ? null : value)}
-        >
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Priority" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Priority</SelectItem>
-            <SelectItem value="high">High</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {hasActiveFilters && (
-          <Button variant="outline" size="sm" onClick={clearFilters}>
-            Clear Filters
-          </Button>
-        )}
-      </div>
+      <Select value={priorityFilter} onValueChange={onPriorityChange}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by priority" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Priorities</SelectItem>
+          <SelectItem value="high">High</SelectItem>
+          <SelectItem value="medium">Medium</SelectItem>
+          <SelectItem value="low">Low</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   )
 }

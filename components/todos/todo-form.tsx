@@ -2,137 +2,116 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 
 interface Todo {
-  id: string
+  id: number
   title: string
-  description?: string
+  description: string
   completed: boolean
   priority: "low" | "medium" | "high"
-  due_date?: string
-  created_at: string
-  updated_at: string
+  due_date: string | null
 }
 
 interface TodoFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   todo?: Todo | null
-  onSubmit: (data: {
-    title: string
-    description: string
-    priority: string
-    due_date?: string
-  }) => Promise<void>
+  onSave: () => void
 }
 
-export function TodoForm({ open, onOpenChange, todo, onSubmit }: TodoFormProps) {
+export function TodoForm({ open, onOpenChange, todo, onSave }: TodoFormProps) {
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium")
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    title: todo?.title || "",
-    description: todo?.description || "",
-    priority: todo?.priority || "medium",
-    due_date: todo?.due_date || "",
-  })
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    todo?.due_date ? new Date(todo.due_date) : undefined,
-  )
+
+  // Reset form when dialog opens/closes or todo changes
+  useEffect(() => {
+    if (open) {
+      if (todo) {
+        setTitle(todo.title)
+        setDescription(todo.description || "")
+        setPriority(todo.priority)
+        setDueDate(todo.due_date ? new Date(todo.due_date) : undefined)
+      } else {
+        setTitle("")
+        setDescription("")
+        setPriority("medium")
+        setDueDate(undefined)
+      }
+    }
+  }, [open, todo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.title.trim()) return
+    if (!title.trim()) return
 
     setIsSubmitting(true)
     try {
-      await onSubmit({
-        ...formData,
-        due_date: selectedDate ? selectedDate.toISOString() : undefined,
+      const todoData = {
+        title: title.trim(),
+        description: description.trim(),
+        priority,
+        due_date: dueDate ? dueDate.toISOString() : null,
+        ...(todo && { completed: todo.completed }),
+      }
+
+      const url = todo ? `/api/todos/${todo.id}` : "/api/todos"
+      const method = todo ? "PUT" : "POST"
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(todoData),
       })
 
-      // Reset form
-      setFormData({
-        title: "",
-        description: "",
-        priority: "medium",
-        due_date: "",
-      })
-      setSelectedDate(undefined)
-      onOpenChange(false)
+      if (response.ok) {
+        onSave()
+        onOpenChange(false)
+      }
     } catch (error) {
-      console.error("Failed to submit todo:", error)
+      console.error("Error saving todo:", error)
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      // Reset form when closing
-      setFormData({
-        title: todo?.title || "",
-        description: todo?.description || "",
-        priority: todo?.priority || "medium",
-        due_date: todo?.due_date || "",
-      })
-      setSelectedDate(todo?.due_date ? new Date(todo.due_date) : undefined)
-    }
-    onOpenChange(newOpen)
+  const handleClose = () => {
+    onOpenChange(false)
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{todo ? "Edit Todo" : "Create New Todo"}</DialogTitle>
-          <DialogDescription>{todo ? "Update your todo item." : "Add a new item to your todo list."}</DialogDescription>
         </DialogHeader>
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Enter todo title..."
-              required
-            />
+          <div>
+            <Input placeholder="Todo title" value={title} onChange={(e) => setTitle(e.target.value)} required />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+          <div>
             <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Enter description (optional)..."
+              placeholder="Description (optional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               rows={3}
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="priority">Priority</Label>
-            <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value })}>
+          <div>
+            <Select value={priority} onValueChange={(value: "low" | "medium" | "high") => setPriority(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>
@@ -143,33 +122,31 @@ export function TodoForm({ open, onOpenChange, todo, onSubmit }: TodoFormProps) 
               </SelectContent>
             </Select>
           </div>
-
-          <div className="space-y-2">
-            <Label>Due Date (Optional)</Label>
+          <div>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
+                  type="button"
                   variant="outline"
-                  className={cn("w-full justify-start text-left font-normal", !selectedDate && "text-muted-foreground")}
+                  className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
+                  {dueDate ? format(dueDate, "PPP") : "Pick a due date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <CalendarComponent mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
+              <PopoverContent className="w-auto p-0">
+                <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
               </PopoverContent>
             </Popover>
           </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+          <div className="flex justify-end space-x-2">
+            <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || !formData.title.trim()}>
+            <Button type="submit" disabled={isSubmitting || !title.trim()}>
               {isSubmitting ? "Saving..." : todo ? "Update" : "Create"}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

@@ -1,69 +1,57 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth"
-import { sql } from "@/lib/db"
+import { neon } from "@neondatabase/serverless"
+import jwt from "jsonwebtoken"
+
+const sql = neon(process.env.DATABASE_URL!)
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+    const token = request.cookies.get("auth_token")?.value
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number }
     const { title, description, completed, priority, due_date } = await request.json()
-    const todoId = params.id
+    const todoId = Number.parseInt(params.id)
 
     // Check if todo belongs to user
-    const [existingTodo] = await sql`
-      SELECT id FROM todos WHERE id = ${todoId} AND user_id = ${user.id}
-    `
-
-    if (!existingTodo) {
+    const existingTodo = await sql("SELECT * FROM todos WHERE id = $1 AND user_id = $2", [todoId, decoded.userId])
+    if (existingTodo.length === 0) {
       return NextResponse.json({ error: "Todo not found" }, { status: 404 })
     }
 
-    const [updatedTodo] = await sql`
-      UPDATE todos 
-      SET 
-        title = COALESCE(${title}, title),
-        description = COALESCE(${description}, description),
-        completed = COALESCE(${completed}, completed),
-        priority = COALESCE(${priority}, priority),
-        due_date = COALESCE(${due_date}, due_date),
-        updated_at = NOW()
-      WHERE id = ${todoId} AND user_id = ${user.id}
-      RETURNING id, title, description, completed, priority, due_date, created_at, updated_at
-    `
+    const result = await sql(
+      "UPDATE todos SET title = $1, description = $2, completed = $3, priority = $4, due_date = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 AND user_id = $7 RETURNING *",
+      [title, description, completed, priority, due_date, todoId, decoded.userId],
+    )
 
-    return NextResponse.json({ todo: updatedTodo })
+    return NextResponse.json(result[0])
   } catch (error) {
-    console.error("Update todo error:", error)
+    console.error("Error updating todo:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+    const token = request.cookies.get("auth_token")?.value
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const todoId = params.id
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number }
+    const todoId = Number.parseInt(params.id)
 
-    // Check if todo belongs to user and delete
-    const [deletedTodo] = await sql`
-      DELETE FROM todos 
-      WHERE id = ${todoId} AND user_id = ${user.id}
-      RETURNING id
-    `
+    const result = await sql("DELETE FROM todos WHERE id = $1 AND user_id = $2 RETURNING *", [todoId, decoded.userId])
 
-    if (!deletedTodo) {
+    if (result.length === 0) {
       return NextResponse.json({ error: "Todo not found" }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ message: "Todo deleted successfully" })
   } catch (error) {
-    console.error("Delete todo error:", error)
+    console.error("Error deleting todo:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
