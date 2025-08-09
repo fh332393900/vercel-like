@@ -14,6 +14,7 @@ export interface User {
   github_id?: string
   created_at: Date
   updated_at: Date
+  password_hash?: string
 }
 
 export interface SessionUser {

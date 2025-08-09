@@ -1,290 +1,279 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { Plus, Edit, Trash2, Calendar } from "lucide-react"
-import { format, isAfter } from "date-fns"
+import * as React from "react"
+import { PlusCircle } from "lucide-react"
 
+import type { Todo } from "@/types/todo"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { TodoForm } from "@/components/todos/todo-form"
-import { TodoFilters } from "@/components/todos/todo-filters"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
-
-interface Todo {
-  id: number
-  title: string
-  description: string
-  completed: boolean
-  priority: "low" | "medium" | "high"
-  due_date: string | null
-  created_at: string
-  updated_at: string
-}
+import { TodoFilters } from "@/components/todos/todo-filters"
+import { TodoForm } from "@/components/todos/todo-form"
+import { TodoItem } from "@/components/todos/todo-item"
 
 export default function TodosPage() {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [loading, setLoading] = useState(true)
-  const [formOpen, setFormOpen] = useState(false)
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [priorityFilter, setPriorityFilter] = useState("all")
+  const [todos, setTodos] = React.useState<Todo[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [isSaving, setIsSaving] = React.useState(false)
+  const [openDialog, setOpenDialog] = React.useState(false)
+  const [editingTodo, setEditingTodo] = React.useState<Todo | undefined>(undefined)
+  const [filters, setFilters] = React.useState({ status: "all", priority: "all" })
   const { toast } = useToast()
 
-  const fetchTodos = useCallback(async () => {
+  const fetchTodos = React.useCallback(async () => {
+    setLoading(true)
     try {
-      const params = new URLSearchParams()
-      if (statusFilter !== "all") params.append("status", statusFilter)
-      if (priorityFilter !== "all") params.append("priority", priorityFilter)
-
-      const response = await fetch(`/api/todos?${params}`)
-      if (response.ok) {
-        const data = await response.json()
-        setTodos(data)
+      const queryParams = new URLSearchParams()
+      if (filters.status !== "all") {
+        queryParams.append("completed", filters.status === "completed" ? "true" : "false")
       }
+      if (filters.priority !== "all") {
+        queryParams.append("priority", filters.priority)
+      }
+
+      const res = await fetch(`/api/todos?${queryParams.toString()}`)
+      if (!res.ok) {
+        throw new Error("Failed to fetch todos")
+      }
+      const data = await res.json()
+      setTodos(data.todos)
     } catch (error) {
       console.error("Error fetching todos:", error)
       toast({
         title: "Error",
-        description: "Failed to fetch todos",
+        description: "Failed to load todos. Please try again.",
         variant: "destructive",
       })
     } finally {
       setLoading(false)
     }
-  }, [statusFilter, priorityFilter, toast])
+  }, [filters, toast])
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchTodos()
   }, [fetchTodos])
 
-  const handleCreateTodo = () => {
-    setEditingTodo(null)
-    setFormOpen(true)
-  }
-
-  const handleEditTodo = (todo: Todo) => {
-    setEditingTodo(todo)
-    setFormOpen(true)
-  }
-
-  const handleToggleComplete = async (todo: Todo) => {
+  const handleSaveTodo = async (todoData: Partial<Todo>) => {
+    setIsSaving(true)
     try {
-      const response = await fetch(`/api/todos/${todo.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...todo, completed: !todo.completed }),
-      })
-
-      if (response.ok) {
-        fetchTodos()
-        toast({
-          title: "Success",
-          description: `Todo ${!todo.completed ? "completed" : "reopened"}`,
+      let res: Response
+      if (editingTodo) {
+        res = await fetch(`/api/todos/${editingTodo.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(todoData),
+        })
+      } else {
+        res = await fetch("/api/todos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(todoData),
         })
       }
+
+      if (!res.ok) {
+        throw new Error("Failed to save todo")
+      }
+
+      toast({
+        title: "Success",
+        description: `Todo ${editingTodo ? "updated" : "created"} successfully.`,
+      })
+      setOpenDialog(false)
+      setEditingTodo(undefined)
+      fetchTodos()
     } catch (error) {
-      console.error("Error updating todo:", error)
+      console.error("Error saving todo:", error)
       toast({
         title: "Error",
-        description: "Failed to update todo",
+        description: `Failed to save todo. Please try again.`,
+        variant: "destructive",
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleToggleComplete = async (id: number, completed: boolean) => {
+    try {
+      const res = await fetch(`/api/todos/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed }),
+      })
+
+      if (!res.ok) {
+        throw new Error("Failed to update todo status")
+      }
+
+      setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === id ? { ...todo, completed } : todo)))
+      toast({
+        title: "Success",
+        description: `Todo marked as ${completed ? "completed" : "pending"}.`,
+      })
+    } catch (error) {
+      console.error("Error toggling complete:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update todo status. Please try again.",
         variant: "destructive",
       })
     }
   }
 
   const handleDeleteTodo = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this todo?")) return
-
+    if (!window.confirm("Are you sure you want to delete this todo?")) {
+      return
+    }
     try {
-      const response = await fetch(`/api/todos/${id}`, { method: "DELETE" })
-      if (response.ok) {
-        fetchTodos()
-        toast({
-          title: "Success",
-          description: "Todo deleted successfully",
-        })
+      const res = await fetch(`/api/todos/${id}`, {
+        method: "DELETE",
+      })
+
+      if (!res.ok) {
+        throw new Error("Failed to delete todo")
       }
+
+      setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
+      toast({
+        title: "Success",
+        description: "Todo deleted successfully.",
+      })
     } catch (error) {
       console.error("Error deleting todo:", error)
       toast({
         title: "Error",
-        description: "Failed to delete todo",
+        description: "Failed to delete todo. Please try again.",
         variant: "destructive",
       })
     }
   }
 
-  const handleFormSave = () => {
-    fetchTodos()
-    toast({
-      title: "Success",
-      description: editingTodo ? "Todo updated successfully" : "Todo created successfully",
-    })
+  const handleEditTodo = (todo: Todo) => {
+    setEditingTodo(todo)
+    setOpenDialog(true)
   }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "destructive"
-      case "medium":
-        return "default"
-      case "low":
-        return "secondary"
-      default:
-        return "default"
+  const handleUpdatePriority = async (id: number, priority: "low" | "medium" | "high") => {
+    try {
+      const res = await fetch(`/api/todos/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ priority }),
+      })
+
+      if (!res.ok) {
+        throw new Error("Failed to update todo priority")
+      }
+
+      setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === id ? { ...todo, priority } : todo)))
+      toast({
+        title: "Success",
+        description: `Todo priority updated to ${priority}.`,
+      })
+    } catch (error) {
+      console.error("Error updating priority:", error)
+      toast({
+        title: "Error",
+        description: "Failed to update todo priority. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
-  const isOverdue = (dueDate: string | null) => {
-    if (!dueDate) return false
-    return isAfter(new Date(), new Date(dueDate))
-  }
-
-  const completedCount = todos.filter((todo) => todo.completed).length
-  const pendingCount = todos.filter((todo) => !todo.completed).length
-  const overdueCount = todos.filter((todo) => !todo.completed && isOverdue(todo.due_date)).length
-
-  if (loading) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Loading todos...</div>
-        </div>
-      </div>
-    )
-  }
+  const completedTodos = todos.filter((todo) => todo.completed).length
+  const pendingTodos = todos.filter((todo) => !todo.completed).length
+  const overdueTodos = todos.filter(
+    (todo) => todo.due_date && new Date(todo.due_date) < new Date() && !todo.completed,
+  ).length
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">My Todos</h1>
-        <Button onClick={handleCreateTodo}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Todo
-        </Button>
+    <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold md:text-2xl">Todos</h1>
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+          <DialogTrigger asChild>
+            <Button
+              onClick={() => {
+                setEditingTodo(undefined)
+                setOpenDialog(true)
+              }}
+            >
+              <PlusCircle className="mr-2 size-4" /> New Todo
+            </Button>
+          </DialogTrigger>
+          <TodoForm
+            todo={editingTodo}
+            onSave={handleSaveTodo}
+            onClose={() => setOpenDialog(false)}
+            isSaving={isSaving}
+            open={openDialog}
+          />
+        </Dialog>
       </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Todos</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{todos.length}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{pendingCount}</div>
+            <div className="text-2xl font-bold">{pendingTodos}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{completedCount}</div>
+            <div className="text-2xl font-bold">{completedTodos}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Overdue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{overdueCount}</div>
+            <div className="text-2xl font-bold text-red-600">{overdueTodos}</div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Filters */}
-      <div className="mb-6">
-        <TodoFilters
-          statusFilter={statusFilter}
-          priorityFilter={priorityFilter}
-          onStatusChange={setStatusFilter}
-          onPriorityChange={setPriorityFilter}
-        />
-      </div>
-
-      {/* Todos List */}
-      <div className="space-y-4">
-        {todos.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <div className="text-muted-foreground text-lg mb-2">No todos found</div>
-              <div className="text-sm text-muted-foreground mb-4">
-                {statusFilter !== "all" || priorityFilter !== "all"
-                  ? "Try adjusting your filters or create a new todo"
-                  : "Create your first todo to get started"}
-              </div>
-              <Button onClick={handleCreateTodo}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Todo
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          todos.map((todo) => (
-            <Card key={todo.id} className={`${todo.completed ? "opacity-75" : ""}`}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3 flex-1">
-                    <Checkbox
-                      checked={todo.completed}
-                      onCheckedChange={() => handleToggleComplete(todo)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <h3 className={`font-medium ${todo.completed ? "line-through text-muted-foreground" : ""}`}>
-                        {todo.title}
-                      </h3>
-                      {todo.description && (
-                        <p
-                          className={`text-sm mt-1 ${todo.completed ? "line-through text-muted-foreground" : "text-muted-foreground"}`}
-                        >
-                          {todo.description}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant={getPriorityColor(todo.priority)}>{todo.priority}</Badge>
-                        {todo.due_date && (
-                          <div
-                            className={`flex items-center text-xs ${
-                              isOverdue(todo.due_date) && !todo.completed ? "text-red-600" : "text-muted-foreground"
-                            }`}
-                          >
-                            <Calendar className="mr-1 h-3 w-3" />
-                            {format(new Date(todo.due_date), "MMM d, yyyy")}
-                            {isOverdue(todo.due_date) && !todo.completed && (
-                              <span className="ml-1 font-medium">(Overdue)</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => handleEditTodo(todo)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDeleteTodo(todo.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
-
-      <TodoForm open={formOpen} onOpenChange={setFormOpen} todo={editingTodo} onSave={handleFormSave} />
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Todos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TodoFilters currentFilters={filters} onFilterChange={setFilters} />
+          <Separator className="my-4" />
+          {loading ? (
+            <div className="text-center text-muted-foreground">Loading todos...</div>
+          ) : todos.length === 0 ? (
+            <div className="text-center text-muted-foreground">No todos found.</div>
+          ) : (
+            <div className="grid gap-3">
+              {todos.map((todo) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  onToggleComplete={handleToggleComplete}
+                  onEdit={handleEditTodo}
+                  onDelete={handleDeleteTodo}
+                  onUpdatePriority={handleUpdatePriority}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -1,76 +1,96 @@
 "use client"
 
-import type React from "react"
-
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BarChart, LayoutDashboard, LogOut, Settings, User, CheckSquare } from "lucide-react"
+import { Bell, Home, LineChart, Package, Settings, ShoppingCart, Users, ListTodo } from "lucide-react"
 
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/components/auth/auth-provider"
-
-interface NavItem {
-  title: string
-  href: string
-  icon: React.ReactNode
-}
 
 export function DashboardNav() {
   const pathname = usePathname()
-  const { logout } = useAuth()
 
-  const navItems: NavItem[] = [
+  const navItems = [
     {
-      title: "Dashboard",
       href: "/dashboard",
-      icon: <LayoutDashboard className="h-5 w-5" />,
+      icon: Home,
+      label: "Dashboard",
+      active: pathname === "/dashboard",
     },
     {
-      title: "Analytics",
+      href: "/dashboard/orders",
+      icon: ShoppingCart,
+      label: "Orders",
+      badge: 6,
+      active: pathname.startsWith("/dashboard/orders"),
+    },
+    {
+      href: "/dashboard/products",
+      icon: Package,
+      label: "Products",
+      active: pathname.startsWith("/dashboard/products"),
+    },
+    {
+      href: "/dashboard/customers",
+      icon: Users,
+      label: "Customers",
+      active: pathname.startsWith("/dashboard/customers"),
+    },
+    {
       href: "/dashboard/analytics",
-      icon: <BarChart className="h-5 w-5" />,
+      icon: LineChart,
+      label: "Analytics",
+      active: pathname.startsWith("/dashboard/analytics"),
     },
     {
-      title: "Todos",
       href: "/dashboard/todos",
-      icon: <CheckSquare className="h-5 w-5" />,
+      icon: ListTodo,
+      label: "Todos",
+      active: pathname.startsWith("/dashboard/todos"),
     },
     {
-      title: "Profile",
-      href: "/profile",
-      icon: <User className="h-5 w-5" />,
-    },
-    {
-      title: "Settings",
       href: "/dashboard/settings",
-      icon: <Settings className="h-5 w-5" />,
+      icon: Settings,
+      label: "Settings",
+      active: pathname.startsWith("/dashboard/settings"),
+    },
+    {
+      href: "/dashboard/notifications",
+      icon: Bell,
+      label: "Notifications",
+      active: pathname.startsWith("/dashboard/notifications"),
     },
   ]
 
   return (
-    <nav className="grid gap-2 px-2">
+    <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
       {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
-            pathname === item.href ? "bg-accent text-accent-foreground" : "text-muted-foreground",
-          )}
-        >
-          {item.icon}
-          {item.title}
-        </Link>
+        <TooltipProvider key={item.href}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
+                  item.active && "bg-accent text-accent-foreground",
+                )}
+              >
+                <item.icon className="size-5" />
+                <span className="sr-only">{item.label}</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {item.label}
+              {item.badge && (
+                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                  {item.badge}
+                </Badge>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ))}
-      <Button
-        variant="ghost"
-        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent text-muted-foreground justify-start"
-        onClick={logout}
-      >
-        <LogOut className="h-5 w-5" />
-        Logout
-      </Button>
     </nav>
   )
 }

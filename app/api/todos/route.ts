@@ -1,67 +1,74 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { neon } from "@neondatabase/serverless"
-import jwt from "jsonwebtoken"
-
-const sql = neon(process.env.DATABASE_URL!)
+import { getCurrentUser } from "@/lib/auth"
+import { sql } from "@/lib/db"
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get("auth_token")?.value
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number }
     const { searchParams } = new URL(request.url)
-    const status = searchParams.get("status")
+    const completed = searchParams.get("completed")
     const priority = searchParams.get("priority")
 
-    let query = "SELECT * FROM todos WHERE user_id = $1"
-    const params: any[] = [decoded.userId]
+    let query = sql`
+      SELECT id, title, description, completed, priority, due_date, created_at, updated_at
+      FROM todos 
+      WHERE user_id = ${user.id}
+    `
 
-    if (status === "completed") {
-      query += " AND completed = true"
-    } else if (status === "pending") {
-      query += " AND completed = false"
+    // Add filters
+    const conditions = []
+    if (completed !== null) {
+      conditions.push(sql`completed = ${completed === "true"}`)
     }
-
     if (priority && priority !== "all") {
-      query += ` AND priority = $${params.length + 1}`
-      params.push(priority)
+      conditions.push(sql`priority = ${priority}`)
     }
 
-    query += " ORDER BY created_at DESC"
+    if (conditions.length > 0) {
+      query = sql`
+        SELECT id, title, description, completed, priority, due_date, created_at, updated_at
+        FROM todos 
+        WHERE user_id = ${user.id} AND ${sql.join(conditions, sql` AND `)}
+      `
+    }
 
-    const todos = await sql(query, params)
-    return NextResponse.json(todos)
+    query = sql`${query} ORDER BY created_at DESC`
+
+    const todos = await query
+
+    return NextResponse.json({ todos })
   } catch (error) {
-    console.error("Error fetching todos:", error)
+    console.error("Get todos error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get("auth_token")?.value
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number }
     const { title, description, priority, due_date } = await request.json()
 
-    if (!title) {
+    if (!title || title.trim() === "") {
       return NextResponse.json({ error: "Title is required" }, { status: 400 })
     }
 
-    const result = await sql(
-      "INSERT INTO todos (user_id, title, description, priority, due_date) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [decoded.userId, title, description || null, priority || "medium", due_date || null],
-    )
+    const [todo] = await sql`
+      INSERT INTO todos (user_id, title, description, priority, due_date)
+      VALUES (${user.id}, ${title.trim()}, ${description?.trim() || null}, ${priority || "medium"}, ${due_date || null})
+      RETURNING id, title, description, completed, priority, due_date, created_at, updated_at
+    `
 
-    return NextResponse.json(result[0], { status: 201 })
+    return NextResponse.json({ todo })
   } catch (error) {
-    console.error("Error creating todo:", error)
+    console.error("Create todo error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

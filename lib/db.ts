@@ -5,7 +5,7 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set")
 }
 
-export const sql = neon(process.env.DATABASE_URL)
+export const sql = neon(process.env.DATABASE_URL!)
 
 // Test database connection
 export async function testConnection() {
@@ -80,31 +80,16 @@ export async function createSession(userId: string, token: string, expiresAt: Da
   }
 }
 
+// This function is not directly used by getCurrentUser in lib/auth.ts,
+// but is kept for completeness if other parts of the app rely on it.
 export async function getSessionByToken(token: string) {
-  try {
-    console.log("Querying session by token:", token.substring(0, 10) + "...")
-
-    const [session] = await sql`
-      SELECT s.id, s.user_id, s.token, s.expires_at, u.email, u.name, u.avatar_url, u.github_id, u.email_verified
-      FROM sessions s
-      JOIN users u ON s.user_id = u.id
-      WHERE s.id = ${token} AND s.expires_at > NOW()
-    `
-
-    console.log("Session query result:", session ? "found" : "not found")
-    if (session) {
-      console.log("Session details:", {
-        user_id: session.user_id,
-        expires_at: session.expires_at,
-        email: session.email,
-      })
-    }
-
-    return session
-  } catch (error) {
-    console.error("Error querying session:", error)
-    throw error
-  }
+  const sessions = await sql`
+    SELECT s.token, s.expires_at, u.id, u.email, u.name, u.avatar_url
+    FROM sessions s
+    JOIN users u ON s.user_id = u.id
+    WHERE s.token = ${token} AND s.expires_at > NOW()
+  `
+  return sessions.length > 0 ? sessions[0] : null
 }
 
 export async function deleteSession(token: string) {

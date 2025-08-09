@@ -1,125 +1,121 @@
 "use client"
-
-import { useState } from "react"
 import { format } from "date-fns"
-import { Calendar, Clock, Edit2, MoreHorizontal, Trash2 } from "lucide-react"
+import { CalendarIcon, Edit, Trash2 } from "lucide-react"
 
+import type { Todo } from "@/types/todo"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-
-interface Todo {
-  id: string
-  title: string
-  description?: string
-  completed: boolean
-  priority: "low" | "medium" | "high"
-  due_date?: string
-  created_at: string
-  updated_at: string
-}
 
 interface TodoItemProps {
   todo: Todo
-  onToggle: (id: string, completed: boolean) => void
+  onToggleComplete: (id: number, completed: boolean) => void
   onEdit: (todo: Todo) => void
-  onDelete: (id: string) => void
+  onDelete: (id: number) => void
+  onUpdatePriority: (id: number, priority: "low" | "medium" | "high") => void
 }
 
-export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
-  const [isToggling, setIsToggling] = useState(false)
-
-  const handleToggle = async () => {
-    setIsToggling(true)
-    await onToggle(todo.id, !todo.completed)
-    setIsToggling(false)
-  }
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 border-red-200"
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200"
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
-    }
-  }
-
+export function TodoItem({ todo, onToggleComplete, onEdit, onDelete, onUpdatePriority }: TodoItemProps) {
   const isOverdue = todo.due_date && new Date(todo.due_date) < new Date() && !todo.completed
 
   return (
     <div
       className={cn(
-        "flex items-start gap-3 p-4 rounded-lg border transition-colors",
-        todo.completed ? "bg-muted/50" : "bg-background",
-        isOverdue ? "border-red-200 bg-red-50/50" : "",
+        "flex items-center gap-3 rounded-md border p-3 transition-colors",
+        todo.completed && "bg-muted/50 opacity-70",
+        isOverdue && !todo.completed && "border-red-500 bg-red-50/50",
       )}
     >
-      <Checkbox checked={todo.completed} onCheckedChange={handleToggle} disabled={isToggling} className="mt-1" />
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1">
-            <h3 className={cn("font-medium text-sm", todo.completed ? "line-through text-muted-foreground" : "")}>
-              {todo.title}
-            </h3>
-            {todo.description && (
-              <p
-                className={cn(
-                  "text-sm mt-1",
-                  todo.completed ? "line-through text-muted-foreground" : "text-muted-foreground",
-                )}
-              >
-                {todo.description}
-              </p>
-            )}
-          </div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">More options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(todo)}>
-                <Edit2 className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(todo.id)} className="text-red-600">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        <div className="flex items-center gap-2 mt-2">
-          <Badge variant="outline" className={getPriorityColor(todo.priority)}>
-            {todo.priority}
-          </Badge>
-
-          {todo.due_date && (
-            <div
-              className={cn("flex items-center gap-1 text-xs", isOverdue ? "text-red-600" : "text-muted-foreground")}
-            >
-              <Calendar className="h-3 w-3" />
-              <span>Due {format(new Date(todo.due_date), "MMM d, yyyy")}</span>
-            </div>
+      <Checkbox
+        id={`todo-${todo.id}`}
+        checked={todo.completed}
+        onCheckedChange={(checked) => onToggleComplete(todo.id, Boolean(checked))}
+        aria-label={`Mark "${todo.title}" as ${todo.completed ? "incomplete" : "complete"}`}
+      />
+      <div className="grid flex-1 gap-1">
+        <Label
+          htmlFor={`todo-${todo.id}`}
+          className={cn(
+            "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+            todo.completed && "line-through text-muted-foreground",
           )}
-
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>Created {format(new Date(todo.created_at), "MMM d")}</span>
-          </div>
+        >
+          {todo.title}
+        </Label>
+        {todo.description && (
+          <p className={cn("text-sm text-muted-foreground", todo.completed && "line-through")}>{todo.description}</p>
+        )}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {todo.due_date && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className={cn("flex items-center gap-1", isOverdue && "text-red-600 font-semibold")}>
+                    <CalendarIcon className="size-3" />
+                    {format(new Date(todo.due_date), "MMM dd, yyyy")}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{isOverdue ? "Overdue" : "Due Date"}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {todo.priority && (
+            <span
+              className={cn(
+                "rounded-full px-2 py-0.5 text-xs font-medium capitalize",
+                todo.priority === "low" && "bg-green-100 text-green-800",
+                todo.priority === "medium" && "bg-yellow-100 text-yellow-800",
+                todo.priority === "high" && "bg-red-100 text-red-800",
+              )}
+            >
+              {todo.priority}
+            </span>
+          )}
         </div>
       </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="size-8">
+            <Edit className="size-4" />
+            <span className="sr-only">Edit Todo</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => onEdit(todo)}>
+            <Edit className="mr-2 size-4" /> Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onDelete(todo.id)} className="text-red-600">
+            <Trash2 className="mr-2 size-4" /> Delete
+          </DropdownMenuItem>
+          <DropdownMenuContent>
+            <RadioGroup
+              value={todo.priority}
+              onValueChange={(value: "low" | "medium" | "high") => onUpdatePriority(todo.id, value)}
+              className="p-2"
+            >
+              <Label className="mb-2 text-sm font-medium">Set Priority</Label>
+              <div className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="low" id="priority-low" />
+                  <Label htmlFor="priority-low">Low</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="medium" id="priority-medium" />
+                  <Label htmlFor="priority-medium">Medium</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="high" id="priority-high" />
+                  <Label htmlFor="priority-high">High</Label>
+                </div>
+              </div>
+            </RadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
