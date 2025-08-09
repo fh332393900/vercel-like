@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BarChart, LayoutDashboard, LogOut, Settings, User } from "lucide-react"
+import { BarChart, LayoutDashboard, LogOut, Settings, User, CheckSquare } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,11 @@ export function DashboardNav() {
       title: "Analytics",
       href: "/dashboard/analytics",
       icon: <BarChart className="h-5 w-5" />,
+    },
+    {
+      title: "Todos",
+      href: "/dashboard/todos",
+      icon: <CheckSquare className="h-5 w-5" />,
     },
     {
       title: "Profile",
