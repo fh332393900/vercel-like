@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAuth } from "@/components/auth/auth-provider"
 
 interface AuthFormProps {
   mode: "login" | "signup"
@@ -32,6 +33,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     password: "",
     name: "",
   })
+  const { login } = useAuth()
 
   const error = searchParams.get("error")
 
@@ -45,6 +47,10 @@ export function AuthForm({ mode }: AuthFormProps) {
     setIsLoading(true)
 
     try {
+      if (mode === "login") {
+        await login()
+        return
+      }
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
       const body =
         mode === "login"
