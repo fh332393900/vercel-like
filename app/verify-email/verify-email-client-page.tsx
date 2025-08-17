@@ -13,7 +13,7 @@ export default function VerifyEmailClientPage() {
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [message, setMessage] = useState("")
-  const {} = useAuth()
+  const { refreshUser } = useAuth()
 
   useEffect(() => {
     const token = searchParams.get("token")
@@ -34,7 +34,7 @@ export default function VerifyEmailClientPage() {
         if (response.ok) {
           setStatus("success")
           setMessage(data.message)
-          await refreshUser()
+          //await refreshUser()
           // Redirect to dashboard after 3 seconds
           setTimeout(() => {
             router.push("/dashboard")
