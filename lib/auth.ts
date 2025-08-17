@@ -12,9 +12,11 @@ export interface User {
   name: string
   avatar_url?: string
   github_id?: string
+  email_verified?: boolean
+  email_verified_at?: Date
+  password_hash?: string
   created_at: Date
   updated_at: Date
-  password_hash?: string
 }
 
 export interface SessionUser {
@@ -153,7 +155,7 @@ export async function loginUser(email: string, password: string): Promise<User> 
   return user
 }
 
-// Register new user
+// Register new user (now only used for GitHub OAuth)
 export async function registerUser(email: string, password: string, name: string): Promise<User> {
   // Check if user already exists
   const existingUsers = await sql`
@@ -167,10 +169,10 @@ export async function registerUser(email: string, password: string, name: string
   // Hash password
   const passwordHash = await bcrypt.hash(password, 12)
 
-  // Create user
+  // Create user with email verification required
   const users = await sql`
-  INSERT INTO users (email, password_hash, name, created_at, updated_at)
-  VALUES (${email}, ${passwordHash}, ${name}, NOW(), NOW())
+  INSERT INTO users (email, password_hash, name, email_verified, created_at, updated_at)
+  VALUES (${email}, ${passwordHash}, ${name}, false, NOW(), NOW())
   RETURNING *
 `
 
@@ -198,12 +200,14 @@ export async function loginWithGithub(githubUser: {
       const user = existingUsers[0] as User
       console.log("Existing user found:", user.id)
 
-      // Update GitHub info if not set
+      // Update GitHub info if not set and mark email as verified
       if (!user.github_id) {
         await sql`
         UPDATE users 
         SET github_id = ${githubUser.id}, 
             avatar_url = ${githubUser.avatar_url},
+            email_verified = true,
+            email_verified_at = NOW(),
             updated_at = NOW()
         WHERE id = ${user.id}
       `
@@ -213,11 +217,11 @@ export async function loginWithGithub(githubUser: {
       return user
     }
 
-    // Create new user
+    // Create new user (GitHub users are automatically verified)
     console.log("Creating new user from GitHub data")
     const newUsers = await sql`
-    INSERT INTO users (email, name, github_id, avatar_url, created_at, updated_at)
-    VALUES (${githubUser.email}, ${githubUser.name}, ${githubUser.id}, ${githubUser.avatar_url}, NOW(), NOW())
+    INSERT INTO users (email, name, github_id, avatar_url, email_verified, email_verified_at, created_at, updated_at)
+    VALUES (${githubUser.email}, ${githubUser.name}, ${githubUser.id}, ${githubUser.avatar_url}, true, NOW(), NOW(), NOW())
     RETURNING *
   `
 

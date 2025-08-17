@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { Eye, EyeOff, Github, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Github, Loader2, Mail, CheckCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,6 +25,8 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isGithubLoading, setIsGithubLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [registrationEmail, setRegistrationEmail] = useState("")
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -63,18 +65,29 @@ export function AuthForm({ mode }: AuthFormProps) {
         throw new Error(data.error || "Authentication failed")
       }
 
-      toast({
-        title: mode === "login" ? "Login successful" : "Account created",
-        description: mode === "login" ? "Welcome back to DeployHub!" : "Your account has been created successfully.",
-      })
+      if (mode === "login") {
+        toast({
+          title: "Login successful",
+          description: "Welcome back to DeployHub!",
+        })
 
-      // Redirect to dashboard
-      router.push("/dashboard")
-      router.refresh()
+        // Redirect to dashboard
+        router.push("/dashboard")
+        router.refresh()
+      } else {
+        // Registration success - show email verification message
+        setRegistrationSuccess(true)
+        setRegistrationEmail(data.email)
+
+        toast({
+          title: "Registration initiated",
+          description: "Please check your email to verify your account.",
+        })
+      }
     } catch (error: any) {
       toast({
-        title: "Authentication failed",
-        description: error.message || "Please check your credentials and try again.",
+        title: mode === "login" ? "Login failed" : "Registration failed",
+        description: error.message || "Please check your information and try again.",
         variant: "destructive",
       })
     } finally {
@@ -108,6 +121,46 @@ export function AuthForm({ mode }: AuthFormProps) {
       default:
         return "An error occurred during authentication."
     }
+  }
+
+  // Show success message for registration
+  if (registrationSuccess && mode === "signup") {
+    return (
+      <Card className="w-full max-w-md border-none bg-white/80 backdrop-blur-sm shadow-xl">
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-4">
+            <CheckCircle className="h-16 w-16 text-green-500" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+          <CardDescription>We've sent a verification link to your email address</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <Mail className="h-4 w-4" />
+            <AlertDescription>
+              A verification email has been sent to <strong>{registrationEmail}</strong>. Please click the link in the
+              email to complete your registration.
+            </AlertDescription>
+          </Alert>
+
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">The verification link will expire in 1 hour.</p>
+            <p className="text-sm text-muted-foreground">Didn't receive the email? Check your spam folder.</p>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setRegistrationSuccess(false)
+              setFormData({ email: "", password: "", name: "" })
+            }}
+          >
+            Try again
+          </Button>
+        </CardFooter>
+      </Card>
+    )
   }
 
   return (
@@ -209,6 +262,17 @@ export function AuthForm({ mode }: AuthFormProps) {
               </Button>
             </div>
           </div>
+
+          {mode === "signup" && (
+            <Alert>
+              <Mail className="h-4 w-4" />
+              <AlertDescription>
+                You'll receive a verification email after registration. Please verify your email to complete the signup
+                process.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Button type="submit" className="w-full" disabled={isLoading || isGithubLoading}>
             {isLoading ? (
               <>

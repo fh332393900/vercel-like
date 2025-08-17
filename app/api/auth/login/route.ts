@@ -10,6 +10,17 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await loginUser(email, password)
+
+    // Check if email is verified
+    if (!user.email_verified) {
+      return NextResponse.json(
+        {
+          error: "Please verify your email address before logging in. Check your inbox for the verification email.",
+        },
+        { status: 403 },
+      )
+    }
+
     await createUserSession(user)
 
     return NextResponse.json({
@@ -26,6 +37,10 @@ export async function POST(request: NextRequest) {
 
     if (error.message === "Invalid credentials") {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })
+    }
+
+    if (error.message === "Please use GitHub login for this account") {
+      return NextResponse.json({ error: "Please use GitHub login for this account" }, { status: 400 })
     }
 
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
