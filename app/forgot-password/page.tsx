@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Login | DeployHub",
-  description: "Login to your DeployHub account",
+  title: "Forgot Password | DeployHub",
+  description: "Reset your DeployHub account password",
 }
 
 export default function ForgotPasswordPage() {
-  return <div>111<div/>
+  return <div>Forgot Password Page</div>
 }
