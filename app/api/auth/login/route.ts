@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { randomBytes } from "crypto"
 import { getUserByEmail, createSession } from "@/lib/db"
+import { createUserSession } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,13 +59,13 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    response.cookies.set("session", sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: "/",
-    })
+    //response.cookies.set("session", sessionToken, {
+    //  httpOnly: true,
+    //  secure: process.env.NODE_ENV === "production",
+    //  sameSite: "lax",
+    //  maxAge: 7 * 24 * 60 * 60, // 7 days
+    //  path: "/",
+    //})
 
     return response
   } catch (error) {
