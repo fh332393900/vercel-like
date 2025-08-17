@@ -34,9 +34,10 @@ export default function VerifyEmailClientPage() {
         if (response.ok) {
           setStatus("success")
           setMessage(data.message)
-          //await refreshUser()
+          
           // Redirect to dashboard after 3 seconds
-          setTimeout(() => {
+          setTimeout(async () => {
+            await refreshUser()
             router.push("/dashboard")
           }, 3000)
         } else {
