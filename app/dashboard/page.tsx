@@ -8,6 +8,7 @@ import { SessionDebug } from "@/components/debug/session-debug"
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
+  console.log(user, 111)
 
   if (!user) {
     redirect("/login")
