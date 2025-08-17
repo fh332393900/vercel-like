@@ -48,7 +48,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     try {
       if (mode === "login") {
-        await login()
+        await login({ email: formData.email, password: formData.password })
         return
       }
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register"
