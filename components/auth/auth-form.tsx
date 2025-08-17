@@ -73,7 +73,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
         // Redirect to dashboard
         router.push("/dashboard")
-        router.refresh()
+        //router.refresh()
       } else {
         // Registration success - show email verification message
         setRegistrationSuccess(true)
