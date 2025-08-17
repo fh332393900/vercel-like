@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
     const sessionToken = randomBytes(32).toString("hex")
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
-    await createSession(user.id, sessionToken, expiresAt)
+    // await createSession(user.id, sessionToken, expiresAt)
+    await createUserSession(user)
 
     // Set session cookie
     const response = NextResponse.json({
