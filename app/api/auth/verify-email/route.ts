@@ -15,31 +15,38 @@ export async function GET(request: NextRequest) {
     // Get pending user data from Redis
     const pendingUser = await getPendingUser(token)
     if (!pendingUser) {
-      return NextResponse.json(
-        { error: "Invalid or expired verification token. Please register again." },
-        { status: 400 },
-      )
+      return NextResponse.json({ error: "Invalid or expired verification token" }, { status: 400 })
     }
 
     // Create user in database
     const user = await createUser({
-      email: pendingUser.email,
       name: pendingUser.name,
+      email: pendingUser.email,
       passwordHash: pendingUser.passwordHash,
       emailVerified: true,
     })
+
+    // Clean up pending user data
+    await deletePendingUser(token)
 
     // Create session for auto-login
     const sessionToken = randomBytes(32).toString("hex")
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
-    await createSession(user.id.toString(), sessionToken, expiresAt)
+    await createSession(user.id, sessionToken, expiresAt)
 
-    // Delete pending user data from Redis
-    await deletePendingUser(token)
+    // Set session cookie
+    const response = NextResponse.json({
+      message: "Email verified successfully! You are now logged in.",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar_url: user.avatar_url,
+        email_verified: true,
+      },
+    })
 
-    // Set session cookie and redirect
-    const response = NextResponse.redirect(new URL("/dashboard", request.url))
     response.cookies.set("session", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

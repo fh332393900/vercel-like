@@ -1,4 +1,6 @@
-interface PendingUser {
+import { kv } from "@vercel/kv"
+
+export interface PendingUser {
   name: string
   email: string
   passwordHash: string
@@ -7,120 +9,39 @@ interface PendingUser {
 
 export async function storePendingUser(token: string, userData: PendingUser): Promise<void> {
   try {
-    const response = await fetch(`${process.env.KV_REST_API_URL}/set/${encodeURIComponent(`pending:${token}`)}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        value: JSON.stringify(userData),
-        ex: 3600, // 1 hour expiry
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`Redis error: ${response.status} ${response.statusText}`)
-    }
-
-    console.log("Stored pending user in Redis:", { token: token.substring(0, 10) + "...", email: userData.email })
+    // Store with 1 hour expiration (3600 seconds)
+    await kv.setex(`pending_user:${token}`, 3600, JSON.stringify(userData))
+    console.log("Pending user stored in Redis:", { token: token.substring(0, 10) + "...", email: userData.email })
   } catch (error) {
-    console.error("Error storing pending user:", error)
-    throw error
+    console.error("Failed to store pending user in Redis:", error)
+    throw new Error("Failed to store registration data")
   }
 }
 
 export async function getPendingUser(token: string): Promise<PendingUser | null> {
   try {
-    const response = await fetch(`${process.env.KV_REST_API_URL}/get/${encodeURIComponent(`pending:${token}`)}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-      },
-    })
+    const data = await kv.get(`pending_user:${token}`)
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null
-      }
-      throw new Error(`Redis error: ${response.status} ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    if (!data.result) {
+    if (!data) {
+      console.log("No pending user found for token:", token.substring(0, 10) + "...")
       return null
     }
 
-    const userData = JSON.parse(data.result)
-    console.log("Retrieved pending user from Redis:", { token: token.substring(0, 10) + "...", email: userData.email })
+    const userData = typeof data === "string" ? JSON.parse(data) : (data as PendingUser)
+    console.log("Retrieved pending user from Redis:", { email: userData.email })
     return userData
   } catch (error) {
-    console.error("Error getting pending user:", error)
-    throw error
+    console.error("Failed to retrieve pending user from Redis:", error)
+    return null
   }
 }
 
 export async function deletePendingUser(token: string): Promise<void> {
   try {
-    const response = await fetch(`${process.env.KV_REST_API_URL}/del/${encodeURIComponent(`pending:${token}`)}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`Redis error: ${response.status} ${response.statusText}`)
-    }
-
-    console.log("Deleted pending user from Redis:", { token: token.substring(0, 10) + "..." })
+    await kv.del(`pending_user:${token}`)
+    console.log("Deleted pending user from Redis:", token.substring(0, 10) + "...")
   } catch (error) {
-    console.error("Error deleting pending user:", error)
-    throw error
-  }
-}
-
-export async function setWithExpiry(key: string, value: any, expirySeconds: number): Promise<void> {
-  try {
-    const response = await fetch(`${process.env.KV_REST_API_URL}/set/${encodeURIComponent(key)}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        value: JSON.stringify(value),
-        ex: expirySeconds,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`Redis error: ${response.status} ${response.statusText}`)
-    }
-  } catch (error) {
-    console.error("Error setting value with expiry:", error)
-    throw error
-  }
-}
-
-export async function getValue(key: string): Promise<any> {
-  try {
-    const response = await fetch(`${process.env.KV_REST_API_URL}/get/${encodeURIComponent(key)}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-      },
-    })
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null
-      }
-      throw new Error(`Redis error: ${response.status} ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    return data.result ? JSON.parse(data.result) : null
-  } catch (error) {
-    console.error("Error getting value:", error)
-    throw error
+    console.error("Failed to delete pending user from Redis:", error)
+    // Don't throw error here as it's not critical
   }
 }
