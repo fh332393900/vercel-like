@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
       name: pendingUser.name,
       email: pendingUser.email,
       passwordHash: pendingUser.passwordHash,
+      emailVerified: true,
     })
 
     // Clean up pending user data

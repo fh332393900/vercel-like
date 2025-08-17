@@ -29,10 +29,11 @@ export async function createUser(userData: {
   passwordHash?: string
   githubId?: string
   avatarUrl?: string
+  emailVerified?: boolean
 }) {
   const [user] = await sql`
     INSERT INTO users (email, name, password_hash, github_id, avatar_url, email_verified)
-    VALUES (${userData.email}, ${userData.name}, ${userData.passwordHash || null}, ${userData.githubId || null}, ${userData.avatarUrl || null}, ${!!userData.githubId})
+    VALUES (${userData.email}, ${userData.name}, ${userData.passwordHash || null}, ${userData.githubId || null}, ${userData.avatarUrl || null}, ${userData.emailVerified || !!userData.githubId})
     RETURNING id, email, name, avatar_url, github_id, email_verified, created_at
   `
   return user
