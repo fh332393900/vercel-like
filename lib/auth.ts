@@ -2,21 +2,17 @@ import "server-only"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
-import { sql } from "@/lib/db"
+import { sql, getSessionByToken } from "@/lib/db"
 
 const JWT_SECRET = process.env.JWT_SECRET!
 
 export interface User {
-  id: number
+  id: string
   email: string
   name: string
   avatar_url?: string
   github_id?: string
-  email_verified?: boolean
-  email_verified_at?: Date
-  password_hash?: string
-  created_at: Date
-  updated_at: Date
+  email_verified: boolean
 }
 
 export interface SessionUser {
@@ -91,42 +87,30 @@ export async function createUserSession(user: SessionUser) {
 }
 
 // Get current user from session
-export async function getCurrentUser(): Promise<SessionUser | null> {
+export async function getCurrentUser(): Promise<User | null> {
   try {
-    const cookieStore = await cookies()
-    const sessionId = cookieStore.get("session")?.value
+    const cookieStore = cookies()
+    const sessionToken = cookieStore.get("session")?.value
 
-    if (!sessionId) {
-      console.log("No session cookie found")
+    if (!sessionToken) {
       return null
     }
 
-    // Get session from database
-    const sessions = await sql`
-    SELECT s.token, s.expires_at, u.id, u.email, u.name, u.avatar_url
-    FROM sessions s
-    JOIN users u ON s.user_id = u.id
-    WHERE s.id = ${sessionId} AND s.expires_at > NOW()
-  `
-
-    if (sessions.length === 0) {
-      console.log("No valid session found in database")
+    const session = await getSessionByToken(sessionToken)
+    if (!session) {
       return null
     }
 
-    const session = sessions[0]
-
-    // Verify token
-    const user = verifyToken(session.token)
-    if (!user) {
-      console.log("Token verification failed")
-      return null
+    return {
+      id: session.user_id,
+      email: session.email,
+      name: session.name,
+      avatar_url: session.avatar_url,
+      github_id: session.github_id,
+      email_verified: session.email_verified,
     }
-
-    console.log("User authenticated successfully:", { id: user.id, email: user.email })
-    return user
   } catch (error) {
-    console.error("Failed to get current user:", error)
+    console.error("Error getting current user:", error)
     return null
   }
 }
@@ -237,7 +221,7 @@ export async function loginWithGithub(githubUser: {
 // Logout user
 export async function logoutUser() {
   try {
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     const sessionId = cookieStore.get("session")?.value
 
     if (sessionId) {
@@ -254,3 +238,21 @@ export async function logoutUser() {
 
 // Alias so other modules can import { logout }
 export const logout = logoutUser
+
+// Require authentication
+export async function requireAuth(): Promise<User> {
+  const user = await getCurrentUser()
+  if (!user) {
+    throw new Error("Authentication required")
+  }
+  return user
+}
+
+// Require email verification
+export async function requireEmailVerification(): Promise<User> {
+  const user = await requireAuth()
+  if (!user.email_verified) {
+    throw new Error("Email verification required")
+  }
+  return user
+}

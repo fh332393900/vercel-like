@@ -7,6 +7,9 @@ if (!process.env.DATABASE_URL) {
 
 export const sql = neon(process.env.DATABASE_URL)
 
+// Export query as an alias for sql for compatibility
+export const query = sql
+
 // Test database connection
 export async function testConnection() {
   try {

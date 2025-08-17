@@ -1,13 +1,10 @@
-import type { Metadata } from "next"
+import { Suspense } from "react"
 import VerifyEmailClientPage from "./verify-email-client-page"
 
-export const dynamic = "force-dynamic"
-
-export const metadata: Metadata = {
-  title: "Verify Email | DeployHub",
-  description: "Verify your email address to complete registration",
-}
-
 export default function VerifyEmailPage() {
-  return <VerifyEmailClientPage />
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyEmailClientPage />
+    </Suspense>
+  )
 }

@@ -301,3 +301,6 @@ export function AuthForm({ mode }: AuthFormProps) {
     </Card>
   )
 }
+
+// Export as default as well for compatibility
+export default AuthForm

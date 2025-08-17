@@ -1,61 +1,47 @@
-import "server-only"
+import { kv } from "@vercel/kv"
 
-// 使用Upstash KV
-const KV_REST_API_URL = process.env.KV_REST_API_URL!
-const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN!
-
-if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
-  throw new Error("KV_REST_API_URL and KV_REST_API_TOKEN must be set")
+export interface PendingUser {
+  name: string
+  email: string
+  passwordHash: string
+  createdAt: string
 }
 
-interface KVResponse<T = any> {
-  result: T
-}
-
-async function kvRequest(command: string[], method: "GET" | "POST" = "POST") {
-  const response = await fetch(KV_REST_API_URL, {
-    method,
-    headers: {
-      Authorization: `Bearer ${KV_REST_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(command),
-  })
-
-  if (!response.ok) {
-    throw new Error(`KV request failed: ${response.statusText}`)
+export async function storePendingUser(token: string, userData: PendingUser): Promise<void> {
+  try {
+    // Store with 1 hour expiration (3600 seconds)
+    await kv.setex(`pending_user:${token}`, 3600, JSON.stringify(userData))
+    console.log("Pending user stored in Redis:", { token: token.substring(0, 10) + "...", email: userData.email })
+  } catch (error) {
+    console.error("Failed to store pending user in Redis:", error)
+    throw new Error("Failed to store registration data")
   }
-
-  return response.json()
 }
 
-export async function setWithExpiry(key: string, value: any, expirySeconds: number) {
-  const command = ["SET", key, JSON.stringify(value), "EX", expirySeconds.toString()]
-  return kvRequest(command)
-}
+export async function getPendingUser(token: string): Promise<PendingUser | null> {
+  try {
+    const data = await kv.get(`pending_user:${token}`)
 
-export async function get<T = any>(key: string): Promise<T | null> {
-  const command = ["GET", key]
-  const response: KVResponse<string | null> = await kvRequest(command)
+    if (!data) {
+      console.log("No pending user found for token:", token.substring(0, 10) + "...")
+      return null
+    }
 
-  if (response.result === null) {
+    const userData = typeof data === "string" ? JSON.parse(data) : (data as PendingUser)
+    console.log("Retrieved pending user from Redis:", { email: userData.email })
+    return userData
+  } catch (error) {
+    console.error("Failed to retrieve pending user from Redis:", error)
     return null
   }
+}
 
+export async function deletePendingUser(token: string): Promise<void> {
   try {
-    return JSON.parse(response.result)
-  } catch {
-    return response.result as T
+    await kv.del(`pending_user:${token}`)
+    console.log("Deleted pending user from Redis:", token.substring(0, 10) + "...")
+  } catch (error) {
+    console.error("Failed to delete pending user from Redis:", error)
+    // Don't throw error here as it's not critical
   }
-}
-
-export async function del(key: string) {
-  const command = ["DEL", key]
-  return kvRequest(command)
-}
-
-export async function exists(key: string): Promise<boolean> {
-  const command = ["EXISTS", key]
-  const response: KVResponse<number> = await kvRequest(command)
-  return response.result === 1
 }

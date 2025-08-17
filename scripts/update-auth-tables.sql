@@ -1,17 +1,17 @@
--- Add email verification fields to users table
-ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP;
+-- Update users table to ensure email_verified column exists
+ALTER TABLE users 
+ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE;
 
--- Create email verification tokens table for tracking
-CREATE TABLE IF NOT EXISTS email_verification_tokens (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email VARCHAR(255) NOT NULL,
-  token VARCHAR(255) NOT NULL UNIQUE,
-  expires_at TIMESTAMP NOT NULL,
-  used BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+-- Update existing GitHub users to have verified emails
+UPDATE users 
+SET email_verified = TRUE 
+WHERE github_id IS NOT NULL AND email_verified IS NULL;
 
--- Create index for faster lookups
-CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_token ON email_verification_tokens(token);
-CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_email ON email_verification_tokens(email);
+-- Update existing regular users to have unverified emails by default
+UPDATE users 
+SET email_verified = FALSE 
+WHERE github_id IS NULL AND email_verified IS NULL;
+
+-- Add index for better performance
+CREATE INDEX IF NOT EXISTS idx_users_email_verified ON users(email_verified);
+CREATE INDEX IF NOT EXISTS idx_users_github_id ON users(github_id);
