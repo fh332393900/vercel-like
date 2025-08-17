@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getPendingUser, deletePendingUser } from "@/lib/redis"
 import { createUser, createSession } from "@/lib/db"
 import { randomBytes } from "crypto"
+import { createUserSession } from "@/lib/auth"
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,27 +34,10 @@ export async function GET(request: NextRequest) {
     const sessionToken = randomBytes(32).toString("hex")
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
-    await createSession(user.id, sessionToken, expiresAt)
+    await createUserSession(user)
 
     // Set session cookie
-    const response = NextResponse.json({
-      message: "Email verified successfully! You are now logged in.",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        avatar_url: user.avatar_url,
-        email_verified: true,
-      },
-    })
-
-    response.cookies.set("session", sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: "/",
-    })
+    const response = NextResponse.redirect(new URL("/dashboard", request.url))
 
     return response
   } catch (error) {
