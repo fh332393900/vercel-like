@@ -48,7 +48,16 @@ export async function POST(request: NextRequest) {
     await createUserSession(user)
 
     // Set session cookie
-    const response = NextResponse.redirect(new URL("/dashboard", request.url))
+    const response = NextResponse.json({
+      message: "Login successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar_url: user.avatar_url,
+        email_verified: user.email_verified,
+      },
+    })
 
     //response.cookies.set("session", sessionToken, {
     //  httpOnly: true,

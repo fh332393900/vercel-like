@@ -37,7 +37,16 @@ export async function GET(request: NextRequest) {
     await createUserSession(user)
 
     // Set session cookie
-    const response = NextResponse.redirect(new URL("/dashboard", request.url))
+    const response = NextResponse.json({
+      message: "Email verified successfully! You are now logged in.",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar_url: user.avatar_url,
+        email_verified: true,
+      },
+    })
 
     return response
   } catch (error) {
