@@ -85,6 +85,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/dashboard")
   }
 
+  const verifyEmailLogin = async (token: string) => {
+    const response = await fetch(`/api/auth/verify-email?token=${token}`)
+
+    if (!response.ok) {
+      const data = await response.json()
+      throw new Error(data.error || "Login failed")
+    }
+
+    const data = await response.json()
+    setUser(data.user)
+    return data
+  }
+
   const logout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" })

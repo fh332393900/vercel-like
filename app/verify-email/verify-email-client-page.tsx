@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle, XCircle, Loader2 } from "lucide-react"
+import { useAuth } from "@/components/auth/auth-provider"
 
 export default function VerifyEmailClientPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [message, setMessage] = useState("")
+  const {} = useAuth()
 
   useEffect(() => {
     const token = searchParams.get("token")
@@ -28,10 +30,11 @@ export default function VerifyEmailClientPage() {
         const response = await fetch(`/api/auth/verify-email?token=${token}`)
         const data = await response.json()
 
+
         if (response.ok) {
           setStatus("success")
           setMessage(data.message)
-
+          await refreshUser()
           // Redirect to dashboard after 3 seconds
           setTimeout(() => {
             router.push("/dashboard")
