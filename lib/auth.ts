@@ -102,7 +102,7 @@ export async function getCurrentUser(): Promise<User | null> {
     }
 
     return {
-      id: session.user_id,
+      id: session.user_id.toString(),
       email: session.email,
       name: session.name,
       avatar_url: session.avatar_url,
@@ -226,7 +226,7 @@ export async function logoutUser() {
 
     if (sessionId) {
       // Delete session from database
-      await sql`DELETE FROM sessions WHERE id = ${sessionId}`
+      await sql`DELETE FROM sessions WHERE token = ${sessionId}`
     }
 
     // Clear cookie
