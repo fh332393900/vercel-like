@@ -174,10 +174,10 @@ export function AuthForm({ mode }: AuthFormProps) {
   return (
     <Card className="w-full max-w-md border-none bg-white/80 backdrop-blur-sm shadow-xl">
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold">{mode === "login" ? "Welcome Back" : "Create an Account"}</CardTitle>
+        <CardTitle className="text-2xl font-bold">{ mode === "login" ? t('auth.welcomeBack') : t('auth.createAccount') }</CardTitle>
         <CardDescription>
           {mode === "login"
-            ? "Sign in to your account to access your projects"
+            ? t('auth.signInDescription')
             : "Sign up for DeployHub to start deploying your projects"}
         </CardDescription>
       </CardHeader>
@@ -196,7 +196,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           disabled={isLoading || isGithubLoading}
         >
           {isGithubLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Github className="h-4 w-4" />}
-          {mode === "login" ? "Sign in with GitHub" : "Sign up with GitHub"}
+          {mode === "login" ? t('auth.signInWithGithub') : t('auth.signInWithGithub')}
         </Button>
 
         <div className="relative my-4">
@@ -204,7 +204,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             <span className="w-full border-t"></span>
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-muted-foreground">Or continue with email</span>
+            <span className="bg-white px-2 text-muted-foreground">{ t('auth.continueWithEmail') }</span>
           </div>
         </div>
 
@@ -224,7 +224,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{ t('auth.email') }</Label>
             <Input
               id="email"
               name="email"
@@ -238,10 +238,10 @@ export function AuthForm({ mode }: AuthFormProps) {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{ t('auth.password') }</Label>
               {mode === "login" && (
                 <Link href="/forgot-password" className="text-xs text-purple-600 hover:text-purple-700">
-                  Forgot password?
+                  { t('auth.forgotPassword') }
                 </Link>
               )}
             </div>
@@ -285,10 +285,10 @@ export function AuthForm({ mode }: AuthFormProps) {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {mode === "login" ? "Signing in..." : "Creating account..."}
+                {mode === "login" ? t('auth.signingIn') : "Creating account..."}
               </>
             ) : mode === "login" ? (
-              "Sign In"
+              t('auth.signin')
             ) : (
               "Create Account"
             )}
@@ -297,12 +297,12 @@ export function AuthForm({ mode }: AuthFormProps) {
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
-          {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+          {mode === "login" ? t('auth.noAccount') : "Already have an account? "}
           <Link
             href={mode === "login" ? "/signup" : "/login"}
             className="text-purple-600 hover:text-purple-700 font-medium"
           >
-            {mode === "login" ? "Sign up" : "Sign in"}
+            {mode === "login" ? t('auth.signUp') : t('auth.signin')}
           </Link>
         </p>
       </CardFooter>

@@ -161,6 +161,17 @@
   }
 }
 
+@keyframes fadeInType {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-blob {
   animation: blob 7s infinite;
 }
@@ -177,7 +188,6 @@
   animation: typing 2s steps(40, end);
   white-space: nowrap;
   overflow: hidden;
-  width: 0;
   display: inline-block;
 }
 

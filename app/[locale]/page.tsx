@@ -202,20 +202,20 @@ export default function Home() {
                     </div>
                     <div className="mt-4 font-mono text-xs">
                       <p>$ git push deployhub main</p>
-                      <p className="mt-2 animate-typing overflow-hidden whitespace-nowrap">→ Analyzing repository...</p>
-                      <p className="animate-typing animation-delay-500 overflow-hidden whitespace-nowrap">
+                      <p className="mt-2 opacity-0 animate-[fadeInType_0.8s_ease-in-out_0.5s_forwards]">→ Analyzing repository...</p>
+                      <p className="opacity-0 animate-[fadeInType_0.8s_ease-in-out_1.3s_forwards]">
                         → Building project...
                       </p>
-                      <p className="animate-typing animation-delay-1000 overflow-hidden whitespace-nowrap">
+                      <p className="opacity-0 animate-[fadeInType_0.8s_ease-in-out_2.1s_forwards]">
                         → Optimizing assets...
                       </p>
-                      <p className="animate-typing animation-delay-1500 overflow-hidden whitespace-nowrap">
+                      <p className="opacity-0 animate-[fadeInType_0.8s_ease-in-out_2.9s_forwards]">
                         → Deploying to production...
                       </p>
-                      <p className="text-green-400 animate-typing animation-delay-2000 overflow-hidden whitespace-nowrap">
+                      <p className="text-green-400 opacity-0 animate-[fadeInType_0.8s_ease-in-out_3.7s_forwards]">
                         ✓ Deployment complete!
                       </p>
-                      <p className="mt-4 text-blue-400 animate-typing animation-delay-2500 overflow-hidden whitespace-nowrap">
+                      <p className="mt-4 text-blue-400 opacity-0 animate-[fadeInType_0.8s_ease-in-out_4.5s_forwards]">
                         🚀 Your project is live at: https://your-project.deployhub.app
                       </p>
                     </div>
