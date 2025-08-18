@@ -191,7 +191,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         {/* GitHub OAuth Button */}
         <Button
           variant="outline"
-          className="w-full gap-2 bg-black text-white hover:bg-gray-800 border-black mb-4"
+          className="w-full gap-2 bg-black text-white hover:bg-gray-800 hover:text-white border-black mb-4"
           onClick={handleGithubAuth}
           disabled={isLoading || isGithubLoading}
         >
