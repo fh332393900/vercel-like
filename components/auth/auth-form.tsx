@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useAuth } from "@/components/auth/auth-provider"
+import { useTranslations } from "next-intl"
 
 interface AuthFormProps {
   mode: "login" | "signup"
@@ -34,6 +35,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     name: "",
   })
   const { login } = useAuth()
+  const t = useTranslations()
 
   const error = searchParams.get("error")
 

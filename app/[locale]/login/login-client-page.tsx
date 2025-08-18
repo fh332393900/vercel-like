@@ -6,8 +6,11 @@ import { Rocket } from "lucide-react"
 import { Suspense } from "react"
 
 import { AuthForm } from "@/components/auth/auth-form"
+import { useTranslations } from "next-intl";
 
 export default function LoginClientPage() {
+  const t = useTranslations();
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center relative overflow-hidden">
       {/* Animated background elements */}
@@ -20,7 +23,7 @@ export default function LoginClientPage() {
 
       <Link href="/" className="absolute left-8 top-8 flex items-center gap-2 transition-transform hover:scale-105">
         <Rocket className="h-6 w-6 text-purple-600 animate-pulse" />
-        <span className="text-xl font-bold">DeployHub</span>
+        <span className="text-xl font-bold">{ t('common.appName') }</span>
       </Link>
 
       <div className="relative z-10 w-full max-w-md p-4">
