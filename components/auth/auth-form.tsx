@@ -139,21 +139,20 @@ export function AuthForm({ mode }: AuthFormProps) {
           <div className="flex justify-center mb-4">
             <CheckCircle className="h-16 w-16 text-green-500" />
           </div>
-          <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
-          <CardDescription>We've sent a verification link to your email address</CardDescription>
+          <CardTitle className="text-2xl font-bold">{ t('auth.checkEmail') }</CardTitle>
+          <CardDescription>{ t('auth.emailSent') }</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert>
             <Mail className="h-4 w-4" />
             <AlertDescription>
-              A verification email has been sent to <strong>{registrationEmail}</strong>. Please click the link in the
-              email to complete your registration.
+              { t.rich('auth.emailSentTip', { email: () => <strong>{registrationEmail}</strong> }) }
             </AlertDescription>
           </Alert>
 
           <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">The verification link will expire in 1 hour.</p>
-            <p className="text-sm text-muted-foreground">Didn't receive the email? Check your spam folder.</p>
+            <p className="text-sm text-muted-foreground">{ t('auth.expireTip') }</p>
+            <p className="text-sm text-muted-foreground">{ t('auth.notReceive') }</p>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center">
@@ -164,7 +163,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               setFormData({ email: "", password: "", name: "" })
             }}
           >
-            Try again
+            { t('auth.tryAgain') }
           </Button>
         </CardFooter>
       </Card>
@@ -178,7 +177,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <CardDescription>
           {mode === "login"
             ? t('auth.signInDescription')
-            : "Sign up for DeployHub to start deploying your projects"}
+            : t('auth.signInDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -211,7 +210,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" && (
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{ t('settings.profile.fullName') }</Label>
               <Input
                 id="name"
                 name="name"
@@ -275,8 +274,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             <Alert>
               <Mail className="h-4 w-4" />
               <AlertDescription>
-                You'll receive a verification email after registration. Please verify your email to complete the signup
-                process.
+                { t('auth.signUpDescription') }
               </AlertDescription>
             </Alert>
           )}
@@ -285,19 +283,19 @@ export function AuthForm({ mode }: AuthFormProps) {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {mode === "login" ? t('auth.signingIn') : "Creating account..."}
+                {mode === "login" ? t('auth.signingIn') : t('auth.creatingAccount')}
               </>
             ) : mode === "login" ? (
               t('auth.signin')
             ) : (
-              "Create Account"
+              t('auth.createAccount')
             )}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
-          {mode === "login" ? t('auth.noAccount') : "Already have an account? "}
+          {mode === "login" ? t('auth.noAccount') : t('auth.alreadyHaveAccount')}
           <Link
             href={mode === "login" ? "/signup" : "/login"}
             className="text-purple-600 hover:text-purple-700 font-medium"

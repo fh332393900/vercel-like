@@ -283,11 +283,12 @@
   },
   "auth": {
     "welcomeBack": "Welcome Back",
-    "createAccount": "Create an Account",
+    "createAccount": "Create Account",
     "signInDescription": "Sign in to your account to access your projects",
     "signInWithGithub": "Sign in with GitHub",
     "continueWithEmail": "Or continue with email",
     "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
     "orContinueWith": "Or continue with",
     "google": "Google",
     "email": "Email",
@@ -299,7 +300,16 @@
     "termsNotice": "By signing in, you agree to our",
     "termsOfService": "Terms of Service",
     "and": "and",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "signUpDescription": "You'll receive a verification email after registration. Please verify your email to complete the signup process.",
+    "alreadyHaveAccount": "Already have an account?",
+    "checkEmail": "Check your email",
+    "emailSent": "We've sent a verification link to your email address",
+    "emailSentTip": "A verification email has been sent to <email></email>. Please click the link in the email to complete your registration.",
+    "expireTip": "The verification link will expire in 1 hour.",
+    "notReceive": "Didn't receive the email? Check your spam folder.",
+    "tryAgain": "Try again"
+
   },
   "language": {
     "en": "English",

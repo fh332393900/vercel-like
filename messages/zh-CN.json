@@ -209,7 +209,7 @@
     "profile": {
       "title": "个人资料信息",
       "description": "更新您的个人资料信息和头像",
-      "fullName": "全名",
+      "fullName": "用户名",
       "email": "电子邮箱",
       "changeAvatar": "更改头像"
     },
@@ -275,6 +275,7 @@
     "signInWithGithub": "使用GitHub登录",
     "continueWithEmail": "或者使用电子邮箱",
     "signingIn": "登录中...",
+    "creatingAccount": "创建账户中...",
     "orContinueWith": "或继续使用",
     "google": "Google",
     "email": "电子邮箱",
@@ -286,7 +287,16 @@
     "termsNotice": "登录即表示您同意我们的",
     "termsOfService": "服务条款",
     "and": "和",
-    "privacyPolicy": "隐私政策"
+    "privacyPolicy": "隐私政策",
+    "signUpDescription": "注册后，您将收到一封验证邮件。请验证您的邮箱以完成注册流程。",
+    "alreadyHaveAccount": "已经有账户？", 
+    "checkEmail": "检查您的电子邮箱",
+    "emailSent": "我们已向您的电子邮箱发送了一封验证邮件",
+    "emailSentTip": "验证邮件已经发送到<email></email>，请点击邮件链接完成注册。",
+    "expireTip": "验证链接将在1小时后过期",
+    "notReceive": "没有收到邮件？请检查你的垃圾邮件文件夹",
+    "tryAgain": "重试"
+
   },
   "language": {
     "en": "English",
